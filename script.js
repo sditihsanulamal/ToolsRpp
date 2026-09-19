@@ -516,7 +516,10 @@ function generateAndShow(overrides = null) {
   updatePreviewHtml(overrides);
   currentPreviewId = null;
   
-  if ($('btn-save-kantong')) $('btn-save-kantong').style.display = 'inline-flex';
+  if ($('btn-save-kantong')) {
+    $('btn-save-kantong').style.display = 'inline-flex';
+    $('btn-save-kantong').innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Simpan ke Kantong';
+  }
   if ($('btn-edit-kantong')) $('btn-edit-kantong').style.display = 'none';
   
   // Switch view to preview
@@ -802,7 +805,10 @@ function previewSinglePage(id) {
   $('panel-preview').style.display = 'flex';
   
   currentPreviewId = id;
-  if ($('btn-save-kantong')) $('btn-save-kantong').style.display = 'none';
+  if ($('btn-save-kantong')) {
+    $('btn-save-kantong').style.display = 'inline-flex';
+    $('btn-save-kantong').innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Perbarui Kantong';
+  }
   if ($('btn-edit-kantong')) $('btn-edit-kantong').style.display = 'inline-flex';
   
   showToast(`👁️ Preview: ${page.label}`, 'info', 2000);
@@ -932,7 +938,13 @@ function renderKantong() {
 }
 
 // Wire up kantong buttons
-$('btn-save-kantong')?.addEventListener('click', addToKantong);
+$('btn-save-kantong')?.addEventListener('click', () => {
+  if (currentPreviewId && currentPreviewId !== 'all') {
+    showToast('✅ Perubahan Anda otomatis tersimpan di Kantong!', 'success');
+  } else {
+    addToKantong();
+  }
+});
 $('btn-edit-kantong')?.addEventListener('click', () => {
   if (currentPreviewId) loadPageToForm(currentPreviewId);
 });
