@@ -498,7 +498,7 @@ function buildRPPHtml(d) {
 // ============================================================
 // GENERATE & PREVIEW
 // ============================================================
-function generateAndShow(overrides = null) {
+function updatePreviewHtml(overrides = null) {
   const d = collectData();
   if (overrides) Object.assign(d, overrides);
   const html = buildRPPHtml(d);
@@ -507,6 +507,10 @@ function generateAndShow(overrides = null) {
   doc.innerHTML = html;
   doc.style.display = 'block';
   empty.style.display = 'none';
+}
+
+function generateAndShow(overrides = null) {
+  updatePreviewHtml(overrides);
   
   // Switch view to preview
   document.querySelector('.panel-form').style.display = 'none';
@@ -530,7 +534,7 @@ let previewDebounce;
 function schedulePreviewUpdate() {
   if ($('rpp-document').style.display !== 'block') return;
   clearTimeout(previewDebounce);
-  previewDebounce = setTimeout(() => generateAndShow(), 700);
+  previewDebounce = setTimeout(() => updatePreviewHtml(), 700);
 }
 
 // Attach live update to all form inputs
