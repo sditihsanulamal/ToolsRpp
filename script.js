@@ -8,6 +8,7 @@
 
 const STORAGE_KEY = 'tools_rpp_wafa_apikey';
 const LOGO_KEY = 'tools_rpp_wafa_logo';
+const KANTONG_KEY = 'tools_rpp_wafa_kantong';
 let currentTab = 0;
 const TOTAL_TABS = 4;
 
@@ -181,9 +182,9 @@ document.addEventListener('click', (e) => {
 // ============================================================
 function getSelectedModel() {
   const sel = $('gemini-model');
-  if (!sel) return 'gemini-1.5-flash';
+  if (!sel) return 'gemini-2.0-flash';
   if (sel.value === 'custom') {
-    return $('gemini-model-custom')?.value.trim() || 'gemini-1.5-flash';
+    return $('gemini-model-custom')?.value.trim() || 'gemini-2.0-flash';
   }
   return sel.value;
 }
@@ -785,10 +786,193 @@ Ketentuan penting:
 });
 
 // ============================================================
+// KANTONG — Sistem Multi-Halaman RPP
+// ============================================================
+
+function getKantong() {
+  try { return JSON.parse(localStorage.getItem(KANTONG_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveKantong(pages) {
+  localStorage.setItem(KANTONG_KEY, JSON.stringify(pages));
+}
+
+/** Tambah halaman aktif ke kantong */
+function addToKantong() {
+  const doc = $('rpp-document');
+  if (!doc || !doc.innerHTML.trim() || doc.style.display === 'none') {
+    showToast('\u26a0\ufe0f Generate RPP terlebih dahulu!', 'error'); return;
+  }
+  const d = collectData();
+  const pages = getKantong();
+  const n = pages.length + 1;
+  // Buat label otomatis dari form data
+  const label = `P.${d.pertemuan}${d.materi ? ' \u2014 ' + d.materi : ''}${d.kelas ? ' (Kls.' + d.kelas + ')' : ''}`;
+  pages.push({
+    id: Date.now(),
+    label,
+    formData: d, // simpan data form, bukan HTML — lebih hemat storage
+    savedAt: new Date().toLocaleString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+  });
+  saveKantong(pages);
+  renderKantong();
+  showToast(`\u2705 Halaman ${n} disimpan! (${label})`, 'success');
+}
+
+/** Hapus satu halaman dari kantong */
+function deleteFromKantong(id) {
+  const pages = getKantong().filter(p => p.id !== Number(id));
+  saveKantong(pages);
+  renderKantong();
+  showToast('\ud83d\uddd1\ufe0f Halaman dihapus dari kantong', 'info', 2000);
+}
+window.deleteFromKantong = deleteFromKantong;
+
+/** Preview satu halaman tertentu dari kantong */
+function previewSinglePage(id) {
+  const page = getKantong().find(p => p.id === Number(id));
+  if (!page) return;
+  const html = buildRPPHtml(page.formData);
+  const doc = $('rpp-document');
+  doc.innerHTML = html;
+  doc.className = 'rpp-document';
+  doc.style.display = 'block';
+  $('empty-state').style.display = 'none';
+  $('preview-body').scrollTop = 0;
+  showToast(`\ud83d\udc41\ufe0f Preview: ${page.label}`, 'info', 2000);
+}
+window.previewSinglePage = previewSinglePage;
+
+/** Preview semua halaman yang ada di kantong */
+function previewAllPages() {
+  const pages = getKantong();
+  if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
+  const allHtml = pages.map((p, i) => `
+    <div class="rpp-page-wrapper">${buildRPPHtml(p.formData)}</div>
+    ${i < pages.length - 1 ? `<div class="rpp-page-break"><span>\u2015 Halaman ${i + 2} \u2015</span></div>` : ''}
+  `).join('');
+  const doc = $('rpp-document');
+  doc.innerHTML = allHtml;
+  doc.className = 'rpp-document multi-page';
+  doc.style.display = 'block';
+  $('empty-state').style.display = 'none';
+  $('preview-body').scrollTop = 0;
+  showToast(`\ud83d\udc41\ufe0f Menampilkan ${pages.length} halaman RPP`, 'success');
+}
+
+/** Cetak semua halaman (PDF) */
+function printAllPages() {
+  const pages = getKantong();
+  if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
+  previewAllPages();
+  setTimeout(() => window.print(), 500);
+}
+
+/** Export semua halaman ke Word (.doc) */
+function exportToWord() {
+  const pages = getKantong();
+  if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
+
+  const wordStyle = `<style>
+    body{font-family:Arial,sans-serif;font-size:11pt;margin:2cm 2.5cm;}
+    table{border-collapse:collapse;width:100%;}
+    td,th{border:1px solid #1a1a1a;padding:6px 9px;vertical-align:top;}
+    th{font-weight:bold;text-align:center;}
+    .wafa-doc-title{text-align:center;font-size:12pt;font-weight:bold;margin-bottom:14px;}
+    .wafa-identity-section,.wafa-id-table{width:100%;border-collapse:collapse;border:none;}
+    .wafa-identity-section td,.wafa-id-table td{border:none;padding:2px 4px;}
+    .wafa-logo-box{width:44px;height:44px;background:#10b981;display:inline-block;text-align:center;line-height:44px;font-size:20px;font-weight:bold;color:white;border-radius:4px;}
+    .wafa-sig-row{display:flex;justify-content:space-between;margin-top:10px;}
+    .wafa-sig-block{text-align:center;width:45%;}
+    .wafa-sig-name{font-weight:bold;border-top:1px solid #1a1a1a;padding-top:4px;margin-top:52px;}
+    .wafa-sig-nip{font-size:10pt;color:#444;}
+    .keg-alpha-list,.keg-bullet-list{padding:0;margin:4px 0;list-style:none;}
+    .keg-bullet-list li{padding-left:12px;position:relative;}
+    .keg-bullet-list li::before{content:'\u2022 ';}
+    .keg-p3-head,.keg-note-label,.keg-practice-head{font-weight:bold;}
+    .col-sp{text-align:center;font-weight:bold;}
+    .col-sarana{text-align:center;}
+    .col-waktu{text-align:center;font-weight:bold;}
+    .wafa-main-table{border:1.5px solid #1a1a1a;}
+    .sarana-stack{display:flex;flex-direction:column;gap:3px;}
+    .sarana-item{border-bottom:1px solid #eee;padding-bottom:2px;}
+    .sarana-item:last-child{border-bottom:none;}
+  </style>`;
+
+  const allPages = pages.map((p, i) => `
+    <div>${buildRPPHtml(p.formData)}</div>
+    ${i < pages.length - 1 ? '<div style="page-break-after:always"></div>' : ''}
+  `).join('');
+
+  const fullHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'/>${wordStyle}</head><body>${allPages}</body></html>`;
+
+  const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const p0 = pages[0]?.formData;
+  a.download = `RPP_Wafa${p0?.materi ? '_' + p0.materi.replace(/\s+/g, '_') : ''}_${pages.length}hal.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  showToast(`\ud83d\udcc4 File Word (${pages.length} halaman) berhasil diunduh!`, 'success');
+}
+
+/** Render daftar chip di kantong-chips */
+function renderKantong() {
+  const pages = getKantong();
+  const badge = $('kantong-badge');
+  const chips = $('kantong-chips');
+  const actionIds = ['btn-preview-all', 'btn-export-word', 'btn-print-all', 'btn-clear-kantong'];
+
+  if (badge) {
+    badge.textContent = pages.length;
+    badge.style.background = pages.length > 0 ? '' : 'var(--clr-text-muted)';
+  }
+  actionIds.forEach(id => { const el = $(id); if (el) el.disabled = pages.length === 0; });
+
+  if (!chips) return;
+  if (pages.length === 0) {
+    chips.innerHTML = '<p class="kantong-empty">Belum ada halaman. Generate RPP lalu klik \u201c\ud83d\udcbe Simpan ke Kantong\u201d.</p>';
+    return;
+  }
+
+  chips.innerHTML = pages.map((p, i) => `
+    <div class="kantong-chip" id="chip-${p.id}">
+      <div class="chip-num">${i + 1}</div>
+      <div class="chip-info">
+        <span class="chip-label" title="${p.label}">${p.label}</span>
+        <span class="chip-time">${p.savedAt}</span>
+      </div>
+      <div class="chip-actions">
+        <button class="btn-chip-view" onclick="previewSinglePage(${p.id})" title="Preview halaman ini">👁</button>
+        <button class="btn-chip-del" onclick="if(confirm('Hapus halaman ini dari kantong?')) deleteFromKantong(${p.id})" title="Hapus">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Wire up kantong buttons
+$('btn-save-kantong')?.addEventListener('click', addToKantong);
+$('btn-preview-all')?.addEventListener('click', previewAllPages);
+$('btn-print-all')?.addEventListener('click', printAllPages);
+$('btn-export-word')?.addEventListener('click', exportToWord);
+$('btn-clear-kantong')?.addEventListener('click', () => {
+  const n = getKantong().length;
+  if (!n) return;
+  if (!confirm(`Hapus semua ${n} halaman dari Kantong? Tindakan ini tidak bisa dibatalkan.`)) return;
+  localStorage.removeItem(KANTONG_KEY);
+  renderKantong();
+  showToast('\ud83d\uddd1\ufe0f Kantong dikosongkan', 'info');
+});
+
+// ============================================================
 // INIT
 // ============================================================
 loadApiKey();
 loadLogo();
+renderKantong();
 switchTab(0);
 
 // Initialize all existing lists (after BSK/BSP setup)

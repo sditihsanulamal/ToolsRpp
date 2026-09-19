@@ -486,13 +486,13 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:#818cf8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
               <label for="gemini-model" style="white-space:nowrap;font-size:0.74rem;font-weight:600;color:#8b949e">Model AI</label>
               <select id="gemini-model" class="model-select-sm">
-                <option value="gemini-1.5-flash" selected>gemini-1.5-flash ✅ (Stabil)</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-                <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
-                <option value="gemini-2.5-flash-preview-05-20">gemini-2.5-flash (Preview)</option>
+                <option value="gemini-2.0-flash" selected>gemini-2.0-flash ✅ (Terbaru)</option>
+                <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Ringan)</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro (Akurat)</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
                 <option value="custom">Model lain (ketik manual)...</option>
               </select>
-              <input type="text" id="gemini-model-custom" class="model-custom-input" placeholder="Contoh: gemini-1.5-flash" style="display:none" />
+              <input type="text" id="gemini-model-custom" class="model-custom-input" placeholder="Contoh: gemini-2.0-flash" style="display:none" />
             </div>
 
             <div class="ai-banner">
@@ -530,7 +530,44 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Salin Teks
           </button>
+          <button class="btn-preview-tool btn-save-kantong" id="btn-save-kantong">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Simpan ke Kantong
+          </button>
         </div>
+      </div>
+
+      <!-- ===== KANTONG BAR ===== -->
+      <div class="kantong-bar" id="kantong-bar">
+        <div class="kantong-info">
+          <span class="kantong-icon">🗂️</span>
+          <span class="kantong-title">Kantong RPP</span>
+          <span class="kantong-badge" id="kantong-badge">0</span>
+          <span class="kantong-hint">halaman</span>
+        </div>
+        <div class="kantong-actions-row">
+          <button class="btn-kantong-action" id="btn-preview-all" disabled title="Tampilkan semua halaman">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Preview Semua
+          </button>
+          <button class="btn-kantong-action btn-word" id="btn-export-word" disabled title="Unduh sebagai file Word">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Export Word
+          </button>
+          <button class="btn-kantong-action btn-pdf" id="btn-print-all" disabled title="Cetak semua halaman">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Cetak PDF
+          </button>
+          <button class="btn-kantong-danger" id="btn-clear-kantong" disabled title="Hapus semua halaman">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            Hapus Semua
+          </button>
+        </div>
+      </div>
+
+      <!-- Kantong chip list -->
+      <div class="kantong-chips" id="kantong-chips">
+        <p class="kantong-empty">Belum ada halaman. Generate RPP lalu klik “💾 Simpan ke Kantong”.</p>
       </div>
 
       <div class="preview-body" id="preview-body">

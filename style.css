@@ -323,6 +323,122 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 .wafa-sig-name { font-weight: bold; border-top: 1px solid #1a1a1a; padding-top: 4px; margin-top: 52px; font-size: 10.5pt; }
 .wafa-sig-nip { font-size: 10pt; color: #444; }
 
+/* === PREVIEW PANEL override for kantong layout === */
+.panel-preview { background: var(--clr-bg-base); display: flex; flex-direction: column; overflow: hidden; }
+.preview-body { flex: 1; overflow-y: auto; padding: 24px; scrollbar-width: thin; scrollbar-color: var(--clr-bg-elevated) transparent; }
+.preview-body::-webkit-scrollbar { width: 6px; }
+.preview-body::-webkit-scrollbar-thumb { background: var(--clr-bg-elevated); border-radius: 99px; }
+
+/* Save-to-kantong button highlight */
+.btn-save-kantong { background: linear-gradient(135deg, var(--clr-accent-dark), var(--clr-accent)) !important; color: white !important; border-color: transparent !important; box-shadow: 0 2px 10px rgba(16,185,129,0.3); font-weight: 700 !important; }
+.btn-save-kantong:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,0.5) !important; }
+
+/* === KANTONG BAR === */
+.kantong-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  padding: 8px 18px; background: var(--clr-bg-elevated);
+  border-bottom: 1px solid var(--clr-border); gap: 10px; flex-shrink: 0;
+}
+.kantong-info { display: flex; align-items: center; gap: 6px; }
+.kantong-icon { font-size: 0.9rem; }
+.kantong-title { font-size: 0.76rem; font-weight: 700; color: var(--clr-text-secondary); }
+.kantong-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; background: var(--clr-accent);
+  color: white; border-radius: 999px; font-size: 0.68rem; font-weight: 800; padding: 0 5px;
+  transition: all 300ms cubic-bezier(0.34,1.56,0.64,1);
+}
+.kantong-hint { font-size: 0.71rem; color: var(--clr-text-muted); }
+.kantong-actions-row { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+.btn-kantong-action {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 10px; border-radius: var(--radius-full);
+  background: var(--clr-bg-surface); border: 1px solid var(--clr-border-input);
+  color: var(--clr-text-secondary); font-size: 0.73rem; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer; transition: all var(--transition-base); white-space: nowrap;
+}
+.btn-kantong-action:not(:disabled):hover { background: var(--clr-accent-glow); border-color: var(--clr-border-focus); color: var(--clr-accent); }
+.btn-kantong-action:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-kantong-action.btn-word:not(:disabled):hover { background: var(--clr-indigo-glow); border-color: var(--clr-indigo); color: var(--clr-indigo-light); }
+.btn-kantong-action.btn-pdf:not(:disabled):hover { background: rgba(245,158,11,0.12); border-color: var(--clr-amber); color: var(--clr-amber); }
+.btn-kantong-danger {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 10px; border-radius: var(--radius-full);
+  background: rgba(244,63,94,0.07); border: 1px solid rgba(244,63,94,0.2);
+  color: #fb7185; font-size: 0.73rem; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer; transition: all var(--transition-base); white-space: nowrap;
+}
+.btn-kantong-danger:not(:disabled):hover { background: rgba(244,63,94,0.18); }
+.btn-kantong-danger:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* === KANTONG CHIPS === */
+.kantong-chips {
+  padding: 8px 16px; background: var(--clr-bg-panel);
+  border-bottom: 1px solid var(--clr-border);
+  display: flex; flex-wrap: wrap; gap: 6px;
+  min-height: 46px; max-height: 112px; overflow-y: auto; align-items: center;
+  flex-shrink: 0; scrollbar-width: thin; scrollbar-color: var(--clr-bg-elevated) transparent;
+}
+.kantong-chips::-webkit-scrollbar { height: 4px; width: 4px; }
+.kantong-chips::-webkit-scrollbar-thumb { background: var(--clr-bg-elevated); border-radius: 99px; }
+.kantong-empty { font-size: 0.73rem; color: var(--clr-text-muted); font-style: italic; }
+.kantong-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--clr-bg-surface); border: 1px solid var(--clr-border-input);
+  border-radius: var(--radius-full); padding: 4px 8px 4px 5px;
+  transition: all var(--transition-base); animation: chipIn 220ms cubic-bezier(0.34,1.56,0.64,1);
+  cursor: default;
+}
+.kantong-chip:hover { border-color: var(--clr-border-focus); background: var(--clr-bg-elevated); }
+@keyframes chipIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+.chip-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--clr-accent-dark), var(--clr-accent));
+  color: white; font-size: 0.62rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.chip-info { display: flex; flex-direction: column; }
+.chip-label { font-size: 0.73rem; font-weight: 600; color: var(--clr-text-primary); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
+.chip-time { font-size: 0.6rem; color: var(--clr-text-muted); line-height: 1.2; }
+.chip-actions { display: flex; gap: 3px; }
+.btn-chip-view, .btn-chip-del {
+  width: 20px; height: 20px; border-radius: 50%; border: none;
+  font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 150ms ease; line-height: 1;
+}
+.btn-chip-view { background: var(--clr-accent-glow); color: var(--clr-accent); }
+.btn-chip-view:hover { background: var(--clr-accent-dark); color: white; transform: scale(1.15); }
+.btn-chip-del { background: rgba(244,63,94,0.1); color: #fb7185; font-size: 13px; }
+.btn-chip-del:hover { background: rgba(244,63,94,0.25); transform: scale(1.15); }
+
+/* === MULTI-PAGE VIEW === */
+.rpp-document.multi-page {
+  background: transparent !important; box-shadow: none !important;
+  padding: 0 !important; border-radius: 0 !important;
+  display: flex !important; flex-direction: column !important; gap: 0 !important;
+  animation: none !important;
+}
+.rpp-document.multi-page .rpp-page-wrapper {
+  background: white; border-radius: 12px; padding: 30px 36px;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(16,185,129,0.06);
+  animation: docIn 350ms cubic-bezier(0.34,1.56,0.64,1);
+  font-family: Arial, 'Times New Roman', sans-serif; font-size: 11pt; line-height: 1.5; color: #1a1a1a;
+}
+.rpp-page-break {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  height: 40px; margin: 10px 0; color: var(--clr-text-muted); font-size: 0.74rem; font-weight: 600;
+  position: relative;
+}
+.rpp-page-break::before, .rpp-page-break::after {
+  content: ''; flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(16,185,129,0.3), transparent);
+}
+.rpp-page-break span {
+  padding: 3px 12px; background: var(--clr-bg-panel); border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 99px; white-space: nowrap;
+}
+
 /* === TOAST === */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--clr-bg-elevated); color: var(--clr-text-primary); padding: 11px 22px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; border: 1px solid var(--clr-border); box-shadow: var(--shadow-lg); z-index: 9999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
 .toast.show { transform: translateX(-50%) translateY(0); }
@@ -404,14 +520,63 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
    PRINT STYLES
    ============================================= */
 @media print {
-  body { background: white !important; overflow: visible !important; }
-  .app-header, .panel-form, .preview-toolbar, .empty-state, .toast { display: none !important; }
-  .app-main { display: block !important; height: auto !important; margin-top: 0 !important; }
-  .panel-preview { display: block !important; overflow: visible !important; }
-  .preview-body { padding: 0 !important; overflow: visible !important; }
-  .rpp-document { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; max-width: none !important; margin: 0 !important; animation: none !important; }
+  @page { margin: 0mm; size: A4 portrait; }
+  
+  html, body {
+    width: 100% !important;
+    height: auto !important;
+    background: white !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .app-header, .panel-form, .preview-toolbar, .kantong-bar, .kantong-chips, .empty-state, .toast { display: none !important; }
+  
+  .app-main, .panel-preview, .preview-body { 
+    display: block !important; 
+    height: auto !important; 
+    max-height: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important; 
+    position: static !important;
+  }
+
+  /* Single page */
+  .rpp-document:not(.multi-page) { 
+    box-shadow: none !important; 
+    border-radius: 0 !important; 
+    padding: 1.5cm 2cm !important; 
+    max-width: none !important; 
+    margin: 0 !important; 
+    animation: none !important; 
+  }
+
+  /* Multi-page */
+  .rpp-document.multi-page { 
+    background: transparent !important; 
+    box-shadow: none !important; 
+    padding: 0 !important; 
+    display: block !important; 
+    margin: 0 !important;
+  }
+  .rpp-document.multi-page .rpp-page-wrapper { 
+    box-shadow: none !important; 
+    border-radius: 0 !important; 
+    padding: 1.5cm 2cm !important; 
+    page-break-after: always; 
+    break-after: page; 
+    margin: 0 !important; 
+  }
+  .rpp-document.multi-page .rpp-page-wrapper:last-child { 
+    page-break-after: auto; 
+    break-after: auto; 
+  }
+  .rpp-page-break { display: none !important; }
+
   .wafa-main-table th, .wafa-main-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  @page { margin: 2cm 2.5cm; size: A4; }
 }
 
 /* Responsive */
