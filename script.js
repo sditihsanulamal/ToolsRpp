@@ -392,7 +392,7 @@ function buildRPPHtml(d) {
           ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
         </div>
         <div class="wafa-sig-block">
-          <div style="text-align:right;font-style:normal">${tanggalStr}</div>
+          <div>${tanggalStr}</div>
           <div>Guru Wafa</div>
           <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
           ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
