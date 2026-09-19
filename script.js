@@ -105,10 +105,9 @@ function refreshListLabels(listEl) {
     const rmBtn = item.querySelector('.btn-act-rm');
     if (rmBtn) {
       rmBtn.onclick = () => {
-        if (listEl.children.length > 1) {
-          item.remove();
-          refreshListLabels(listEl);
-        }
+        item.remove();
+        refreshListLabels(listEl);
+        schedulePreviewUpdate();
       };
     }
   });
@@ -498,6 +497,8 @@ function buildRPPHtml(d) {
 // ============================================================
 // GENERATE & PREVIEW
 // ============================================================
+let currentPreviewId = null;
+
 function updatePreviewHtml(overrides = null) {
   const d = collectData();
   if (overrides) Object.assign(d, overrides);
@@ -511,6 +512,10 @@ function updatePreviewHtml(overrides = null) {
 
 function generateAndShow(overrides = null) {
   updatePreviewHtml(overrides);
+  currentPreviewId = null;
+  
+  if ($('btn-save-kantong')) $('btn-save-kantong').style.display = 'inline-flex';
+  if ($('btn-edit-kantong')) $('btn-edit-kantong').style.display = 'none';
   
   // Switch view to preview
   document.querySelector('.panel-form').style.display = 'none';
@@ -786,7 +791,16 @@ function previewSinglePage(id) {
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
   $('preview-body').scrollTop = 0;
-  showToast(`\ud83d\udc41\ufe0f Preview: ${page.label}`, 'info', 2000);
+  
+  // Switch view to preview
+  document.querySelector('.panel-form').style.display = 'none';
+  $('panel-preview').style.display = 'flex';
+  
+  currentPreviewId = id;
+  if ($('btn-save-kantong')) $('btn-save-kantong').style.display = 'none';
+  if ($('btn-edit-kantong')) $('btn-edit-kantong').style.display = 'inline-flex';
+  
+  showToast(`👁️ Preview: ${page.label}`, 'info', 2000);
 }
 window.previewSinglePage = previewSinglePage;
 
@@ -796,7 +810,7 @@ function previewAllPages() {
   if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
   const allHtml = pages.map((p, i) => `
     <div class="rpp-page-wrapper">${buildRPPHtml(p.formData)}</div>
-    ${i < pages.length - 1 ? `<div class="rpp-page-break"><span>\u2015 Halaman ${i + 2} \u2015</span></div>` : ''}
+    ${i < pages.length - 1 ? `<div class="rpp-page-break"><span>― Halaman ${i + 2} ―</span></div>` : ''}
   `).join('');
   const doc = $('rpp-document');
   doc.innerHTML = allHtml;
@@ -804,7 +818,16 @@ function previewAllPages() {
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
   $('preview-body').scrollTop = 0;
-  showToast(`\ud83d\udc41\ufe0f Menampilkan ${pages.length} halaman RPP`, 'success');
+  
+  // Switch view to preview
+  document.querySelector('.panel-form').style.display = 'none';
+  $('panel-preview').style.display = 'flex';
+  
+  currentPreviewId = null;
+  if ($('btn-save-kantong')) $('btn-save-kantong').style.display = 'none';
+  if ($('btn-edit-kantong')) $('btn-edit-kantong').style.display = 'none';
+  
+  showToast(`👁️ Menampilkan ${pages.length} halaman RPP`, 'success');
 }
 
 /** Cetak semua halaman (PDF) */
@@ -903,6 +926,9 @@ function renderKantong() {
 
 // Wire up kantong buttons
 $('btn-save-kantong')?.addEventListener('click', addToKantong);
+$('btn-edit-kantong')?.addEventListener('click', () => {
+  if (currentPreviewId) loadPageToForm(currentPreviewId);
+});
 $('btn-preview-all')?.addEventListener('click', previewAllPages);
 $('btn-print-all')?.addEventListener('click', printAllPages);
 $('btn-export-word')?.addEventListener('click', exportToWord);
