@@ -367,129 +367,117 @@ function buildRPPHtml(d) {
   const tanggalStr = d.ttdKota ? `${d.ttdKota}, ${d.ttdTanggal}` : d.ttdTanggal;
 
   const sigRow = `
-    <div class="wafa-footer">
-      <div class="wafa-sig-row">
-        <div class="wafa-sig-block">
-          <div>Mengetahui,</div>
-          <div>${escHtml(d.ksJabatan)}</div>
-          <div class="wafa-sig-name">${escHtml(d.ksNama)}</div>
-          ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
-        </div>
-        <div class="wafa-sig-block">
-          <div>${tanggalStr}</div>
-          <div>Guru Wafa</div>
-          <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
-          ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
-        </div>
-      </div>
+    <div style="margin-top:20px; font-size:10.5pt; font-family:Arial, sans-serif;">
+      <table style="width:100%; border-collapse:collapse; border:none; table-layout:fixed;">
+        <tr>
+          <td style="width:50%; text-align:center; padding:0 10px; border:none; vertical-align:top;">
+            <div>Mengetahui,</div>
+            <div>${escHtml(d.ksJabatan)}</div>
+            <div style="font-weight:bold; border-top:1px solid #1a1a1a; padding-top:4px; margin-top:52px; display:block;">${escHtml(d.ksNama)}</div>
+            ${d.ksNip ? `<div style="font-size:10pt; color:#444;"">NIP. ${escHtml(d.ksNip)}</div>` : ''}
+          </td>
+          <td style="width:50%; text-align:center; padding:0 10px; border:none; vertical-align:top;">
+            <div>${tanggalStr}</div>
+            <div>Guru Wafa</div>
+            <div style="font-weight:bold; border-top:1px solid #1a1a1a; padding-top:4px; margin-top:52px; display:block;">${escHtml(d.guruNama)}</div>
+            ${d.guruNip ? `<div style="font-size:10pt; color:#444;">${escHtml(d.guruNip)}</div>` : ''}
+          </td>
+        </tr>
+      </table>
     </div>`;
 
-  return `
-    <!-- TITLE -->
-    <div class="wafa-doc-title">${escHtml(d.judulRpp)}</div>
+  const S = {
+    docTitle: 'text-align:center;font-size:12pt;font-weight:bold;margin-bottom:14px;font-family:Arial,sans-serif;',
+    idTable: 'width:100%;border-collapse:collapse;border:none;margin-bottom:12px;font-size:10.5pt;',
+    idTd: 'border:none;padding:2px 4px;vertical-align:top;',
+    idLabel: 'border:none;padding:2px 4px;font-weight:bold;white-space:nowrap;vertical-align:top;',
+    idColon: 'border:none;padding:2px 4px;text-align:center;vertical-align:top;',
+    mainTable: 'width:100%;border-collapse:collapse;border:1.5px solid #1a1a1a;margin-bottom:20px;font-size:10.5pt;',
+    th: 'border:1px solid #1a1a1a;padding:7px 8px;text-align:center;font-weight:bold;font-family:Arial,sans-serif;background:white;font-size:10.5pt;',
+    td: 'border:1px solid #1a1a1a;padding:7px 9px;vertical-align:top;',
+    tdSp: 'border:1px solid #1a1a1a;padding:7px 9px;width:6%;text-align:center;font-weight:bold;font-family:Arial,sans-serif;vertical-align:middle;',
+    tdSarana: 'border:1px solid #1a1a1a;padding:7px 9px;width:14%;text-align:center;font-size:10pt;vertical-align:top;',
+    tdWaktu: 'border:1px solid #1a1a1a;padding:7px 9px;width:10%;text-align:center;vertical-align:middle;font-weight:bold;',
+  };
 
-    <!-- IDENTITY TABLE -->
-    <table class="wafa-identity-section">
+  return `
+    <div style="${S.docTitle}">${escHtml(d.judulRpp)}</div>
+
+    <table style="${S.idTable}">
       <tr>
-        <td class="wafa-logo-cell">
-          ${logoHtml}
-        </td>
-        <td>
-          <table class="wafa-id-table">
+        <td style="border:none;padding:2px 8px 2px 0;vertical-align:middle;width:56px;">${logoHtml}</td>
+        <td style="border:none;padding:0;">
+          <table style="${S.idTable}margin-bottom:0;">
             <tr>
-              <td class="wafa-id-label">Buku</td>
-              <td class="wafa-id-colon">:</td>
-              <td class="wafa-id-value">${escHtml(d.buku)}</td>
-              <td class="wafa-id-label">Pertemuan</td>
-              <td class="wafa-id-colon">:</td>
-              <td>${escHtml(d.pertemuan)}</td>
+              <td style="${S.idLabel}">Buku</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.buku)}</td>
+              <td style="${S.idLabel}">Pertemuan</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.pertemuan)}</td>
             </tr>
             <tr>
-              <td class="wafa-id-label">Aspek</td>
-              <td class="wafa-id-colon">:</td>
-              <td class="wafa-id-value">${escHtml(d.aspek)}</td>
-              <td class="wafa-id-label">Kelas</td>
-              <td class="wafa-id-colon">:</td>
-              <td>${escHtml(d.kelas)}</td>
+              <td style="${S.idLabel}">Aspek</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.aspek)}</td>
+              <td style="${S.idLabel}">Kelas</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.kelas)}</td>
             </tr>
             <tr>
-              <td class="wafa-id-label">Materi</td>
-              <td class="wafa-id-colon">:</td>
-              <td class="wafa-id-value">${escHtml(d.materi)}</td>
-              <td class="wafa-id-label">Semester</td>
-              <td class="wafa-id-colon">:</td>
-              <td>${escHtml(d.semester)}</td>
+              <td style="${S.idLabel}">Materi</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.materi)}</td>
+              <td style="${S.idLabel}">Semester</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}">${escHtml(d.semester)}</td>
             </tr>
             <tr>
-              <td class="wafa-id-label">Indikator</td>
-              <td class="wafa-id-colon">:</td>
-              <td class="wafa-id-value" colspan="4" style="white-space:pre-wrap">${escHtml(d.indikator)}</td>
+              <td style="${S.idLabel}">Indikator</td><td style="${S.idColon}">:</td>
+              <td style="${S.idTd}white-space:pre-wrap;" colspan="4">${escHtml(d.indikator)}</td>
             </tr>
           </table>
         </td>
       </tr>
     </table>
 
-    <!-- MAIN 5P TABLE -->
-    <table class="wafa-main-table">
+    <table style="${S.mainTable}">
       <thead>
         <tr>
-          <th class="col-sp" style="width:6%">5<br>P</th>
-          <th class="col-kegiatan" style="width:70%">KEGIATAN</th>
-          <th class="col-sarana" style="width:14%">SARANA</th>
-          <th class="col-waktu" style="width:10%">WAKTU</th>
+          <th style="${S.th}width:6%;">5<br>P</th>
+          <th style="${S.th}width:70%;text-align:left;padding-left:14px;">KEGIATAN</th>
+          <th style="${S.th}width:14%;">SARANA</th>
+          <th style="${S.th}width:10%;">WAKTU</th>
         </tr>
       </thead>
       <tbody>
-
-        <!-- P1 -->
         <tr>
-          <td class="col-sp">P1</td>
-          <td class="col-kegiatan">
-            ${buildAlphaList(d.p1Activities)}
-          </td>
-          <td class="col-sarana">${buildSaranaCell(d.p1Sarana)}</td>
-          <td class="col-waktu">${escHtml(d.p1Waktu)}'</td>
+          <td style="${S.tdSp}">P1</td>
+          <td style="${S.td}width:70%;">${buildAlphaList(d.p1Activities)}</td>
+          <td style="${S.tdSarana}">${buildSaranaCell(d.p1Sarana)}</td>
+          <td style="${S.tdWaktu}">${escHtml(d.p1Waktu)}'</td>
         </tr>
-
-        <!-- P2 -->
         <tr>
-          <td class="col-sp">P2</td>
-          <td class="col-kegiatan">
-            ${buildAlphaList(d.p2Activities)}
-          </td>
-          <td class="col-sarana">${buildSaranaCell(d.p2Sarana)}</td>
-          <td class="col-waktu">${escHtml(d.p2Waktu)}'</td>
+          <td style="${S.tdSp}">P2</td>
+          <td style="${S.td}width:70%;">${buildAlphaList(d.p2Activities)}</td>
+          <td style="${S.tdSarana}">${buildSaranaCell(d.p2Sarana)}</td>
+          <td style="${S.tdWaktu}">${escHtml(d.p2Waktu)}'</td>
         </tr>
-
-        <!-- P3 -->
         <tr>
-          <td class="col-sp">P3</td>
-          <td class="col-kegiatan">${buildP3Cell(d)}</td>
-          <td class="col-sarana">${buildSaranaCell(d.p3Sarana)}</td>
-          <td class="col-waktu">${escHtml(d.p3Waktu)}'</td>
+          <td style="${S.tdSp}">P3</td>
+          <td style="${S.td}width:70%;">${buildP3Cell(d)}</td>
+          <td style="${S.tdSarana}">${buildSaranaCell(d.p3Sarana)}</td>
+          <td style="${S.tdWaktu}">${escHtml(d.p3Waktu)}'</td>
         </tr>
-
-        <!-- P4 -->
         <tr>
-          <td class="col-sp">P4</td>
-          <td class="col-kegiatan">${buildP4Cell(d)}</td>
-          <td class="col-sarana">${buildSaranaCell(d.p4Sarana)}</td>
-          <td class="col-waktu">${escHtml(d.p4Waktu)}'</td>
+          <td style="${S.tdSp}">P4</td>
+          <td style="${S.td}width:70%;">${buildP4Cell(d)}</td>
+          <td style="${S.tdSarana}">${buildSaranaCell(d.p4Sarana)}</td>
+          <td style="${S.tdWaktu}">${escHtml(d.p4Waktu)}'</td>
         </tr>
-
-        <!-- P5 -->
         <tr>
-          <td class="col-sp">P5</td>
-          <td class="col-kegiatan">${buildP5Cell(d)}</td>
-          <td class="col-sarana">${buildSaranaCell(d.p5Sarana)}</td>
-          <td class="col-waktu">${escHtml(d.p5Waktu)}'</td>
+          <td style="${S.tdSp}">P5</td>
+          <td style="${S.td}width:70%;">${buildP5Cell(d)}</td>
+          <td style="${S.tdSarana}">${buildSaranaCell(d.p5Sarana)}</td>
+          <td style="${S.tdWaktu}">${escHtml(d.p5Waktu)}'</td>
         </tr>
-
       </tbody>
     </table>
 
-    <!-- FOOTER / TTD -->
     ${sigRow}
   `;
 }
