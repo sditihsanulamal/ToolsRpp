@@ -387,27 +387,15 @@
             </div>
 
             <div class="form-group">
-              <label for="p5-review">
-                a. Review Materi Hari Ini
-                <span class="label-hint">— kata "Review" akan dicetak bold</span>
-              </label>
-              <textarea id="p5-review" rows="2" placeholder="Contoh: setiap huruf mim sukun membaca ditekan dan membaca bersama-sama buku tilawah 3 hal 2"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="p5-pesan">
-                b. Pesan
-                <span class="label-hint">— kata "Pesan" dan "motivasi" akan dicetak bold</span>
-              </label>
-              <textarea id="p5-pesan" rows="2" placeholder="Contoh: Guru memberikan motivasi setiap bacaan yang benar akan mempengaruhi bacaan berikutnya."></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="p5-doa">
-                c. Do'a
-                <span class="label-hint">— kata "Do'a" akan dicetak bold</span>
-              </label>
-              <input type="text" id="p5-doa" value="Guru mengakhiri pembelajaran dengan doa penutup" />
+              <label>Kegiatan Penutup (P5)</label>
+              <div class="activity-list" id="p5-list">
+                <div class="activity-item">
+                  <span class="act-label alpha">a.</span>
+                  <input type="text" class="act-input" value="Guru mengakhiri pembelajaran dengan doa penutup dan salam" />
+                  <button class="btn-act-rm">×</button>
+                </div>
+              </div>
+              <button class="btn-add-act" data-target="p5-list" data-type="alpha">+ Tambah Kegiatan P5</button>
             </div>
 
             <div class="form-grid-2">

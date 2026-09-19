@@ -306,9 +306,7 @@ function collectData() {
     p4Sarana,
     p4Waktu: $('p4-waktu').value || '15',
     // P5
-    p5Review: $('p5-review').value.trim() || '',
-    p5Pesan: $('p5-pesan').value.trim() || '',
-    p5Doa: $('p5-doa').value.trim() || 'Guru mengakhiri pembelajaran dengan doa penutup',
+    p5Activities: getListValues('p5-list'),
     p5Sarana,
     p5Waktu: $('p5-waktu').value || '5',
     // TTD
@@ -371,18 +369,8 @@ function buildP4Cell(d) {
 }
 
 function buildP5Cell(d) {
-  let parts = [];
-  if (d.p5Review) {
-    parts.push(`<strong>a. Review</strong> Materi hari ini : ${escHtml(d.p5Review)}`);
-  }
-  if (d.p5Pesan) {
-    parts.push(`<strong>b. Pesan</strong> : Guru memberikan <strong>motivasi</strong> ${escHtml(d.p5Pesan)}`);
-  }
-  if (d.p5Doa) {
-    parts.push(`<strong>c. Do'a</strong> : ${escHtml(d.p5Doa)}`);
-  }
-  if (!parts.length) return '-';
-  return `<ul class="keg-alpha-list">${parts.map(p => `<li>${p}</li>`).join('')}</ul>`;
+  if (!d.p5Activities || d.p5Activities.length === 0) return '-';
+  return buildAlphaList(d.p5Activities);
 }
 
 function buildRPPHtml(d) {
@@ -588,7 +576,6 @@ $('btn-reset').addEventListener('click', () => {
   $('p5-waktu').value = '5';
   $('p3-sub').value = 'Penanaman Konsep';
   $('p4-sub').value = 'Baca Simak Klasikal (BSK)';
-  $('p5-doa').value = "Guru mengakhiri pembelajaran dengan doa penutup";
 
   // Reset lists to defaults
   $('p1-list').innerHTML = `
@@ -602,8 +589,10 @@ $('btn-reset').addEventListener('click', () => {
   $('p4-list').innerHTML = `
     <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Siswa membaca 4 baris acak, siswa lain menyimak, Guru menilai bacaan siswa di kartu Prestasi." /><button class="btn-act-rm">×</button></div>
     <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Pada saat siswa membaca ada kesalahan, maka siswa lain langsung memberikan kode kesalahannya misal dengan suara (tut tut). Demikian seterusnya sampai selesai." /><button class="btn-act-rm">×</button></div>`;
+  $('p5-list').innerHTML = `
+    <div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="Guru mengakhiri pembelajaran dengan doa penutup dan salam" /><button class="btn-act-rm">×</button></div>`;
 
-  ['p1-list', 'p3-tiru-list', 'p4-list'].forEach(id => refreshListLabels($(id)));
+  ['p1-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => refreshListLabels($(id)));
 
   // Reset preview
   $('rpp-document').style.display = 'none';
@@ -690,9 +679,7 @@ Tulis dalam format JSON yang VALID berikut ini (tanpa blok kode markdown, hanya 
   "p3Catatan": "catatan variasi atau tips untuk guru",
   "p3TiruSteps": ["langkah Baca Tiru 1", "langkah Baca Tiru 2", "langkah Baca Tiru 3"],
   "p4Activities": ["kegiatan BSK 1", "kegiatan BSK 2"],
-  "p5Review": "ringkasan materi yang direview",
-  "p5Pesan": "pesan motivasi untuk siswa",
-  "p5Doa": "deskripsi kegiatan doa penutup"
+  "p5Activities": ["Review materi yang dipelajari", "Pesan motivasi untuk siswa", "Doa penutup dan salam"]
 }
 
 Ketentuan penting:
@@ -729,9 +716,6 @@ Ketentuan penting:
     if (ai.p3Penjelasan) $('p3-penjelasan').value = ai.p3Penjelasan;
     if (ai.p3Pengulangan) $('p3-pengulangan').value = ai.p3Pengulangan;
     if (ai.p3Catatan) $('p3-catatan').value = ai.p3Catatan;
-    if (ai.p5Review) $('p5-review').value = ai.p5Review;
-    if (ai.p5Pesan) $('p5-pesan').value = ai.p5Pesan;
-    if (ai.p5Doa) $('p5-doa').value = ai.p5Doa;
 
     // Update P1 list
     if (ai.p1Activities?.length) {
@@ -767,6 +751,19 @@ Ketentuan penting:
         const item = document.createElement('div');
         item.className = 'activity-item';
         item.innerHTML = `<span class="act-label bullet">•</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
+        list.appendChild(item);
+      });
+      refreshListLabels(list);
+    }
+
+    // Update P5 list
+    if (ai.p5Activities?.length) {
+      const list = $('p5-list');
+      list.innerHTML = '';
+      ai.p5Activities.forEach((act, i) => {
+        const item = document.createElement('div');
+        item.className = 'activity-item';
+        item.innerHTML = `<span class="act-label alpha">${String.fromCharCode(97 + i)}.</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
         list.appendChild(item);
       });
       refreshListLabels(list);
@@ -976,7 +973,7 @@ renderKantong();
 switchTab(0);
 
 // Initialize all existing lists (after BSK/BSP setup)
-['p1-list', 'p3-tiru-list', 'p4-list'].forEach(id => {
+['p1-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => {
   const el = $(id);
   if (el) refreshListLabels(el);
 });
