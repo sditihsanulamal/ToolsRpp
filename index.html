@@ -126,6 +126,26 @@
             </div>
           </div>
 
+          <!-- Logo Upload -->
+          <div class="form-group full" style="margin-top:4px">
+            <label>Logo Sekolah / Wafa <span class="label-hint">(akan muncul di dokumen RPP)</span></label>
+            <div class="logo-upload-section">
+              <div class="logo-preview-area" id="logo-preview-area" onclick="document.getElementById('logo-upload').click()" title="Klik untuk upload logo">
+                <div class="logo-placeholder" id="logo-placeholder">
+                  <span>W</span>
+                  <p>Klik upload</p>
+                </div>
+                <img id="logo-preview-img" src="" alt="Logo" style="display:none;width:100%;height:100%;object-fit:contain;" />
+              </div>
+              <div class="logo-upload-actions">
+                <label class="btn-upload-logo" for="logo-upload">📁 Pilih File Logo</label>
+                <input type="file" id="logo-upload" accept="image/*" style="display:none" />
+                <button class="btn-remove-logo" id="btn-remove-logo" style="display:none">✕ Hapus Logo</button>
+                <p class="logo-hint">PNG, JPG, atau SVG. Logo akan tampil di pojok kiri atas dokumen RPP.</p>
+              </div>
+            </div>
+          </div>
+
           <div class="tab-nav-footer">
             <div></div>
             <button class="btn-tab-next" data-next="1">Selanjutnya →</button>
@@ -297,10 +317,19 @@
           <!-- P4 -->
           <div class="phase-section">
             <div class="phase-header-row">
-              <span class="phase-badge p4-badge">P4</span>
+              <span class="phase-badge p4-badge" id="p4-badge">P4</span>
               <div>
-                <h2 class="section-title">Baca Simak Klasikal</h2>
-                <p class="section-desc">Penilaian individual dan peer-monitoring</p>
+                <h2 class="section-title" id="p4-section-title">Baca Simak Klasikal</h2>
+                <p class="section-desc" id="p4-section-desc">Penilaian individual dan peer-monitoring</p>
+              </div>
+            </div>
+
+            <!-- BSK / BSP Toggle -->
+            <div class="form-group">
+              <label>Tipe Kegiatan P4</label>
+              <div class="bsk-bsp-toggle-group">
+                <button class="bsk-bsp-btn active" data-type="BSK" id="btn-bsk">📖 Baca Simak Klasikal (BSK)</button>
+                <button class="bsk-bsp-btn" data-type="BSP" id="btn-bsp">🧑‍🎓 Baca Simak Privat (BSP)</button>
               </div>
             </div>
 
@@ -451,6 +480,21 @@
 
           <!-- AI Enhancement -->
           <div class="ai-enhance-section">
+
+            <!-- Model Selector -->
+            <div class="ai-model-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:#818cf8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              <label for="gemini-model" style="white-space:nowrap;font-size:0.74rem;font-weight:600;color:#8b949e">Model AI</label>
+              <select id="gemini-model" class="model-select-sm">
+                <option value="gemini-1.5-flash" selected>gemini-1.5-flash ✅ (Stabil)</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
+                <option value="gemini-2.5-flash-preview-05-20">gemini-2.5-flash (Preview)</option>
+                <option value="custom">Model lain (ketik manual)...</option>
+              </select>
+              <input type="text" id="gemini-model-custom" class="model-custom-input" placeholder="Contoh: gemini-1.5-flash" style="display:none" />
+            </div>
+
             <div class="ai-banner">
               <div class="ai-banner-icon">🤖</div>
               <div class="ai-banner-text">

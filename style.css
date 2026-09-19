@@ -330,6 +330,76 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 .toast.error { border-color: var(--clr-rose); color: #fda4af; }
 .toast.info { border-color: var(--clr-indigo); color: var(--clr-indigo-light); }
 
+/* === LOGO UPLOAD === */
+.logo-upload-section { display: flex; gap: 14px; align-items: flex-start; }
+.logo-preview-area {
+  width: 66px; height: 66px; border-radius: var(--radius-md);
+  border: 2px dashed var(--clr-border-input);
+  overflow: hidden; flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--clr-bg-surface); transition: border-color var(--transition-base);
+}
+.logo-preview-area:hover { border-color: var(--clr-border-focus); background: var(--clr-accent-glow); }
+.logo-placeholder { text-align: center; color: var(--clr-text-muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.logo-placeholder span { font-size: 1.5rem; font-weight: 800; color: var(--clr-accent); line-height: 1; }
+.logo-placeholder p { font-size: 0.58rem; line-height: 1.2; max-width: 52px; }
+.logo-upload-actions { display: flex; flex-direction: column; gap: 6px; }
+.btn-upload-logo {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; background: var(--clr-bg-elevated);
+  border: 1px solid var(--clr-border-input); border-radius: var(--radius-md);
+  color: var(--clr-text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-upload-logo:hover { background: var(--clr-accent-glow); border-color: var(--clr-border-focus); color: var(--clr-accent); }
+.btn-remove-logo {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; background: rgba(244,63,94,0.1);
+  border: 1px solid rgba(244,63,94,0.2); border-radius: var(--radius-md);
+  color: #fb7185; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all var(--transition-base);
+}
+.btn-remove-logo:hover { background: rgba(244,63,94,0.2); }
+.logo-hint { font-size: 0.68rem; color: var(--clr-text-muted); line-height: 1.45; max-width: 180px; }
+
+/* === BSK / BSP TOGGLE === */
+.bsk-bsp-toggle-group { display: flex; gap: 6px; }
+.bsk-bsp-btn {
+  flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
+  font-size: 0.76rem; font-family: var(--font-body); font-weight: 600; cursor: pointer;
+  border: 1.5px solid var(--clr-border-input); background: var(--clr-bg-surface);
+  color: var(--clr-text-muted); transition: all var(--transition-base); text-align: center;
+}
+.bsk-bsp-btn:hover { border-color: var(--clr-border-focus); background: var(--clr-accent-glow); color: var(--clr-text-primary); }
+.bsk-bsp-btn.active {
+  background: linear-gradient(135deg, var(--clr-accent-dark), var(--clr-accent));
+  color: white; border-color: var(--clr-accent);
+  box-shadow: 0 2px 10px rgba(16,185,129,0.35);
+}
+
+/* === AI MODEL SELECTOR === */
+.ai-model-row {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--clr-bg-surface); border: 1px solid var(--clr-border-input);
+  border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 10px;
+}
+.model-select-sm {
+  flex: 1; background: var(--clr-bg-elevated); border: 1px solid var(--clr-border-input);
+  border-radius: var(--radius-sm); padding: 4px 24px 4px 8px; color: var(--clr-text-primary);
+  font-size: 0.76rem; font-family: var(--font-body); outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; cursor: pointer;
+  transition: border-color var(--transition-base);
+}
+.model-select-sm:focus { border-color: var(--clr-border-focus); }
+.model-select-sm option { background: var(--clr-bg-elevated); }
+.model-custom-input {
+  flex: 1; background: var(--clr-bg-elevated); border: 1px solid var(--clr-border-input);
+  border-radius: var(--radius-sm); padding: 4px 8px; color: var(--clr-text-primary);
+  font-size: 0.76rem; font-family: var(--font-body); outline: none;
+}
+.model-custom-input:focus { border-color: var(--clr-border-focus); }
+
 /* =============================================
    PRINT STYLES
    ============================================= */

@@ -7,8 +7,35 @@
 "use strict";
 
 const STORAGE_KEY = 'tools_rpp_wafa_apikey';
+const LOGO_KEY = 'tools_rpp_wafa_logo';
 let currentTab = 0;
 const TOTAL_TABS = 4;
+
+// ============================================================
+// BSK / BSP STATE
+// ============================================================
+let p4Mode = 'BSK';
+
+const BSK_DEFAULTS = {
+  sub: 'Baca Simak Klasikal (BSK)',
+  title: 'Baca Simak Klasikal',
+  desc: 'Penilaian individual dan peer-monitoring',
+  activities: [
+    'Siswa membaca 4 baris acak, siswa lain menyimak, Guru menilai bacaan siswa di kartu Prestasi.',
+    'Pada saat siswa membaca ada kesalahan, maka siswa lain langsung memberikan kode kesalahannya misal dengan suara (tut tut). Demikian seterusnya sampai selesai.',
+  ],
+};
+
+const BSP_DEFAULTS = {
+  sub: 'Baca Simak Privat (BSP)',
+  title: 'Baca Simak Privat',
+  desc: 'Penilaian individual satu per satu oleh guru',
+  activities: [
+    'Guru memanggil siswa satu per satu untuk membaca secara privat di hadapan guru.',
+    'Siswa yang tidak dipanggil mengerjakan tugas mandiri (menulis, mewarnai, atau latihan lainnya).',
+    'Guru menilai bacaan masing-masing siswa di kartu Prestasi dan memberikan umpan balik langsung.',
+  ],
+};
 
 // ============================================================
 // DOM HELPERS
@@ -114,11 +141,103 @@ document.addEventListener('click', (e) => {
   addActivityItem(targetId, type);
 });
 
-// Initialize all existing lists
-['p1-list', 'p3-tiru-list', 'p4-list'].forEach(id => {
-  const el = $(id);
-  if (el) refreshListLabels(el);
+// BSK/BSP Toggle
+function switchP4Mode(type, skipConfirm = false) {
+  const defaults = type === 'BSP' ? BSP_DEFAULTS : BSK_DEFAULTS;
+  p4Mode = type;
+  // Update toggle buttons
+  $$('.bsk-bsp-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.type === type));
+  // Update section header labels
+  const titleEl = $('p4-section-title');
+  const descEl = $('p4-section-desc');
+  if (titleEl) titleEl.textContent = defaults.title;
+  if (descEl) descEl.textContent = defaults.desc;
+  // Update sub input
+  $('p4-sub').value = defaults.sub;
+  // Replace p4-list content
+  const list = $('p4-list');
+  list.innerHTML = '';
+  defaults.activities.forEach(act => {
+    const item = document.createElement('div');
+    item.className = 'activity-item';
+    item.innerHTML = `<span class="act-label bullet">\u2022</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">&times;</button>`;
+    list.appendChild(item);
+  });
+  refreshListLabels(list);
+  schedulePreviewUpdate();
+  showToast(`🔄 Berganti ke ${defaults.sub}`, 'info', 2000);
+}
+
+// Delegate BSK/BSP button clicks
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.bsk-bsp-btn');
+  if (!btn) return;
+  const type = btn.dataset.type;
+  if (type !== p4Mode) switchP4Mode(type);
 });
+
+// ============================================================
+// GET SELECTED GEMINI MODEL
+// ============================================================
+function getSelectedModel() {
+  const sel = $('gemini-model');
+  if (!sel) return 'gemini-1.5-flash';
+  if (sel.value === 'custom') {
+    return $('gemini-model-custom')?.value.trim() || 'gemini-1.5-flash';
+  }
+  return sel.value;
+}
+// Model custom input toggle
+$('gemini-model')?.addEventListener('change', (e) => {
+  const c = $('gemini-model-custom');
+  if (c) c.style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+
+// ============================================================
+// LOGO UPLOAD & DISPLAY
+// ============================================================
+function showLogoPreview(dataUrl) {
+  const img = $('logo-preview-img');
+  const placeholder = $('logo-placeholder');
+  const removeBtn = $('btn-remove-logo');
+  if (img) { img.src = dataUrl; img.style.display = 'block'; }
+  if (placeholder) placeholder.style.display = 'none';
+  if (removeBtn) removeBtn.style.display = 'inline-flex';
+}
+function clearLogoPreview() {
+  const img = $('logo-preview-img');
+  const placeholder = $('logo-placeholder');
+  const removeBtn = $('btn-remove-logo');
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (placeholder) placeholder.style.display = 'flex';
+  if (removeBtn) removeBtn.style.display = 'none';
+}
+function loadLogo() {
+  const d = localStorage.getItem(LOGO_KEY);
+  if (d) showLogoPreview(d);
+}
+$('logo-upload')?.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    localStorage.setItem(LOGO_KEY, dataUrl);
+    showLogoPreview(dataUrl);
+    schedulePreviewUpdate();
+    showToast('\u2705 Logo berhasil diupload!', 'success');
+  };
+  reader.readAsDataURL(file);
+});
+$('btn-remove-logo')?.addEventListener('click', () => {
+  localStorage.removeItem(LOGO_KEY);
+  clearLogoPreview();
+  const inp = $('logo-upload');
+  if (inp) inp.value = '';
+  schedulePreviewUpdate();
+  showToast('\ud83d\uddd1\ufe0f Logo dihapus', 'info');
+});
+
 
 // ============================================================
 // DATA COLLECTION
@@ -266,13 +385,16 @@ function buildP5Cell(d) {
 }
 
 function buildRPPHtml(d) {
-  const tanggalStr = d.ttdKota
-    ? `${d.ttdKota}, ${d.ttdTanggal}`
-    : d.ttdTanggal;
+  // Logo
+  const logoData = localStorage.getItem(LOGO_KEY);
+  const logoHtml = logoData
+    ? `<img src="${logoData}" alt="Logo" style="width:44px;height:44px;object-fit:contain;border-radius:4px;" />`
+    : `<div class="wafa-logo-box">W</div>`;
+
+  const tanggalStr = d.ttdKota ? `${d.ttdKota}, ${d.ttdTanggal}` : d.ttdTanggal;
 
   const sigRow = `
     <div class="wafa-footer">
-      <div class="wafa-footer-date">${tanggalStr}</div>
       <div class="wafa-sig-row">
         <div class="wafa-sig-block">
           <div>Mengetahui,</div>
@@ -281,6 +403,7 @@ function buildRPPHtml(d) {
           ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
         </div>
         <div class="wafa-sig-block">
+          <div style="text-align:right;font-style:normal">${tanggalStr}</div>
           <div>Guru Wafa</div>
           <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
           ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
@@ -296,7 +419,7 @@ function buildRPPHtml(d) {
     <table class="wafa-identity-section">
       <tr>
         <td class="wafa-logo-cell">
-          <div class="wafa-logo-box">W</div>
+          ${logoHtml}
         </td>
         <td>
           <table class="wafa-id-table">
@@ -578,7 +701,7 @@ Ketentuan penting:
 
   try {
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${getSelectedModel()}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -665,7 +788,15 @@ Ketentuan penting:
 // INIT
 // ============================================================
 loadApiKey();
+loadLogo();
 switchTab(0);
+
+// Initialize all existing lists (after BSK/BSP setup)
+['p1-list', 'p3-tiru-list', 'p4-list'].forEach(id => {
+  const el = $(id);
+  if (el) refreshListLabels(el);
+});
+
 
 // Set today as default date
 const today = new Date();
