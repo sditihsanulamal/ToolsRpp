@@ -33,11 +33,10 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="ai-key-wrapper">
-        <svg class="key-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M12 15h8m-4-4v8"/></svg>
-        <input type="password" id="gemini-api-key" placeholder="Gemini API Key (opsional)" autocomplete="off" />
-        <button class="btn-save-key" id="btn-save-key">Simpan</button>
-      </div>
+      <button class="btn-secondary" id="btn-reset" title="Bersihkan Form">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset Form
+      </button>
       <button class="btn-secondary" id="btn-reset">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         Reset
@@ -166,25 +165,15 @@
             </div>
 
             <div class="form-group">
-              <label>Kegiatan P1 <span class="label-hint">(huruf a, b, c... otomatis)</span></label>
+              <label>Kegiatan Pendahuluan (P1)</label>
               <div class="activity-list" id="p1-list">
                 <div class="activity-item">
-                  <span class="act-label">a.</span>
-                  <input type="text" class="act-input" value="Guru mengucapkan salam, sapa, do'a" />
-                  <button class="btn-act-rm">×</button>
-                </div>
-                <div class="activity-item">
-                  <span class="act-label">b.</span>
-                  <input type="text" class="act-input" value="Absen gemar mengaji" />
-                  <button class="btn-act-rm">×</button>
-                </div>
-                <div class="activity-item">
-                  <span class="act-label">c.</span>
-                  <input type="text" class="act-input" value="Guru mengulang pelajaran sebelumnya" />
+                  <span class="act-label alpha">a.</span>
+                  <input type="text" class="act-input" value="" placeholder="Contoh: Guru mengucapkan salam" />
                   <button class="btn-act-rm">×</button>
                 </div>
               </div>
-              <button class="btn-add-act" data-target="p1-list">+ Tambah Kegiatan P1</button>
+              <button class="btn-add-act" data-target="p1-list" data-type="alpha">+ Tambah Kegiatan P1</button>
             </div>
 
             <div class="form-grid-2">
@@ -212,8 +201,15 @@
             </div>
 
             <div class="form-group">
-              <label for="p2-kegiatan">Kegiatan P2</label>
-              <textarea id="p2-kegiatan" rows="3" placeholder="Contoh: Ustadz/n bercerita dan menjelaskan 'Tentang huruf tekan'"></textarea>
+              <label>Kegiatan Pengalaman / Apersepsi (P2)</label>
+              <div class="activity-list" id="p2-list">
+                <div class="activity-item">
+                  <span class="act-label alpha">a.</span>
+                  <input type="text" class="act-input" value="" placeholder="Contoh: Ustadz/n bercerita tentang materi hari ini" />
+                  <button class="btn-act-rm">×</button>
+                </div>
+              </div>
+              <button class="btn-add-act" data-target="p2-list" data-type="alpha">+ Tambah Kegiatan P2</button>
             </div>
 
             <div class="form-grid-2">
@@ -283,17 +279,7 @@
               <div class="activity-list" id="p3-tiru-list">
                 <div class="activity-item">
                   <span class="act-label bullet">•</span>
-                  <input type="text" class="act-input" value="Baca Tiru 2 baris (guru ke siswa) diulang diacak dan siswa secara acak diberikan kesempatan membaca 1 baris" />
-                  <button class="btn-act-rm">×</button>
-                </div>
-                <div class="activity-item">
-                  <span class="act-label bullet">•</span>
-                  <input type="text" class="act-input" value="Baca Tiru 2 baris berikutnya (siswa ke siswa) diulang diacak 4 baris dan setiap siswa diberikan kesempatan membaca 2 baris" />
-                  <button class="btn-act-rm">×</button>
-                </div>
-                <div class="activity-item">
-                  <span class="act-label bullet">•</span>
-                  <input type="text" class="act-input" value="Baca Tiru 3 baris berikutnya (siswa ke siswa dan guru menyimak) diulang diacak 7 baris dan setiap siswa diberikan kesempatan membaca 4 baris" />
+                  <input type="text" class="act-input" value="" placeholder="Contoh: Baca Tiru 2 baris..." />
                   <button class="btn-act-rm">×</button>
                 </div>
               </div>
@@ -343,12 +329,7 @@
               <div class="activity-list" id="p4-list">
                 <div class="activity-item">
                   <span class="act-label bullet">•</span>
-                  <input type="text" class="act-input" value="Siswa membaca 4 baris acak, siswa lain menyimak, Guru menilai bacaan siswa di kartu Prestasi." />
-                  <button class="btn-act-rm">×</button>
-                </div>
-                <div class="activity-item">
-                  <span class="act-label bullet">•</span>
-                  <input type="text" class="act-input" value="Pada saat siswa membaca ada kesalahan, maka siswa lain langsung memberikan kode kesalahannya misal dengan suara (tut tut). Demikian seterusnya sampai selesai." />
+                  <input type="text" class="act-input" value="" placeholder="Isi kegiatan BSK/BSP..." />
                   <button class="btn-act-rm">×</button>
                 </div>
               </div>
@@ -391,7 +372,7 @@
               <div class="activity-list" id="p5-list">
                 <div class="activity-item">
                   <span class="act-label alpha">a.</span>
-                  <input type="text" class="act-input" value="Guru mengakhiri pembelajaran dengan doa penutup dan salam" />
+                  <input type="text" class="act-input" value="" placeholder="Contoh: Doa penutup dan salam" />
                   <button class="btn-act-rm">×</button>
                 </div>
               </div>
@@ -466,43 +447,17 @@
             </div>
           </div>
 
-          <!-- AI Enhancement -->
-          <div class="ai-enhance-section">
-
-            <!-- Model Selector -->
-            <div class="ai-model-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:#818cf8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              <label for="gemini-model" style="white-space:nowrap;font-size:0.74rem;font-weight:600;color:#8b949e">Model AI</label>
-              <select id="gemini-model" class="model-select-sm">
-                <option value="gemini-2.0-flash" selected>gemini-2.0-flash ✅ (Terbaru)</option>
-                <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Ringan)</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro (Akurat)</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="custom">Model lain (ketik manual)...</option>
-              </select>
-              <input type="text" id="gemini-model-custom" class="model-custom-input" placeholder="Contoh: gemini-2.0-flash" style="display:none" />
-            </div>
-
-            <div class="ai-banner">
-              <div class="ai-banner-icon">🤖</div>
-              <div class="ai-banner-text">
-                <strong>Sempurnakan Narasi dengan AI</strong>
-                <p>Gemini AI akan mengisi narasi kegiatan P1–P5 secara otomatis sesuai materi yang Anda masukkan.</p>
-              </div>
-              <button class="btn-ai-enhance" id="btn-ai-enhance">
-                <span id="ai-btn-text">✨ Gunakan AI</span>
-                <span id="ai-spinner" class="spinner hidden"></span>
-              </button>
-            </div>
-            <p class="ai-note" id="ai-note">Masukkan Gemini API Key di bagian atas untuk menggunakan fitur ini.</p>
-          </div>
-
           <div class="tab-nav-footer">
             <button class="btn-tab-prev" data-prev="2">← Sebelumnya</button>
-            <button class="btn-primary btn-generate" id="btn-generate">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              Generate RPP!
-            </button>
+            <div class="form-action-group">
+              <button class="btn-secondary btn-smart-reset" id="btn-smart-reset" title="Bersihkan P1-P5 dan Materi saja">
+                🔄 Bersihkan Materi
+              </button>
+              <button class="btn-primary btn-generate" id="btn-generate">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Generate RPP!
+              </button>
+            </div>
           </div>
         </section>
 
@@ -510,9 +465,12 @@
     </aside>
 
     <!-- ===== PREVIEW PANEL ===== -->
-    <section class="panel-preview">
+    <section class="panel-preview" id="panel-preview" style="display: none;">
       <div class="preview-toolbar">
-        <span class="preview-label">📄 Preview RPP Wafa</span>
+        <button class="btn-secondary btn-back-edit" id="btn-back-edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Kembali Edit
+        </button>
         <div class="preview-tools">
           <button class="btn-preview-tool" id="btn-copy">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>

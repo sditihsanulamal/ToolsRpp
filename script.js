@@ -289,7 +289,7 @@ function collectData() {
     p1Sarana,
     p1Waktu: $('p1-waktu').value || '5',
     // P2
-    p2Kegiatan: $('p2-kegiatan').value.trim() || '',
+    p2Activities: getListValues('p2-list'),
     p2Sarana,
     p2Waktu: $('p2-waktu').value || '5',
     // P3
@@ -462,7 +462,7 @@ function buildRPPHtml(d) {
         <tr>
           <td class="col-sp">P1</td>
           <td class="col-kegiatan">
-            ${buildAlphaList(d.p1Activities.length ? d.p1Activities : ["Guru mengucapkan salam, sapa, do'a", "Absen gemar mengaji", "Guru mengulang pelajaran sebelumnya"])}
+            ${buildAlphaList(d.p1Activities)}
           </td>
           <td class="col-sarana">${buildSaranaCell(d.p1Sarana)}</td>
           <td class="col-waktu">${escHtml(d.p1Waktu)}'</td>
@@ -472,7 +472,7 @@ function buildRPPHtml(d) {
         <tr>
           <td class="col-sp">P2</td>
           <td class="col-kegiatan">
-            ${d.p2Kegiatan ? `<p>${escHtml(d.p2Kegiatan)}</p>` : '<p>Ustadz/n bercerita dan menjelaskan tentang materi hari ini</p>'}
+            ${buildAlphaList(d.p2Activities)}
           </td>
           <td class="col-sarana">${buildSaranaCell(d.p2Sarana)}</td>
           <td class="col-waktu">${escHtml(d.p2Waktu)}'</td>
@@ -522,8 +522,18 @@ function generateAndShow(overrides = null) {
   doc.innerHTML = html;
   doc.style.display = 'block';
   empty.style.display = 'none';
+  
+  // Switch view to preview
+  document.querySelector('.panel-form').style.display = 'none';
+  $('panel-preview').style.display = 'flex';
+  
   $('preview-body').scrollTop = 0;
 }
+
+$('btn-back-edit')?.addEventListener('click', () => {
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
+});
 
 $('btn-generate').addEventListener('click', () => {
   generateAndShow();
@@ -579,27 +589,63 @@ $('btn-reset').addEventListener('click', () => {
 
   // Reset lists to defaults
   $('p1-list').innerHTML = `
-    <div class="activity-item"><span class="act-label">a.</span><input type="text" class="act-input" value="Guru mengucapkan salam, sapa, do'a" /><button class="btn-act-rm">×</button></div>
-    <div class="activity-item"><span class="act-label">b.</span><input type="text" class="act-input" value="Absen gemar mengaji" /><button class="btn-act-rm">×</button></div>
-    <div class="activity-item"><span class="act-label">c.</span><input type="text" class="act-input" value="Guru mengulang pelajaran sebelumnya" /><button class="btn-act-rm">×</button></div>`;
+    <div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Guru mengucapkan salam" /><button class="btn-act-rm">×</button></div>`;
+  $('p2-list').innerHTML = `
+    <div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Apersepsi materi" /><button class="btn-act-rm">×</button></div>`;
   $('p3-tiru-list').innerHTML = `
-    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Baca Tiru 2 baris (guru ke siswa) diulang diacak dan siswa secara acak diberikan kesempatan membaca 1 baris" /><button class="btn-act-rm">×</button></div>
-    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Baca Tiru 2 baris berikutnya (siswa ke siswa) diulang diacak 4 baris dan setiap siswa diberikan kesempatan membaca 2 baris" /><button class="btn-act-rm">×</button></div>
-    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Baca Tiru 3 baris berikutnya (siswa ke siswa dan guru menyimak) diulang diacak 7 baris dan setiap siswa diberikan kesempatan membaca 4 baris" /><button class="btn-act-rm">×</button></div>`;
+    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="" placeholder="Contoh: Baca Tiru 2 baris..." /><button class="btn-act-rm">×</button></div>`;
   $('p4-list').innerHTML = `
-    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Siswa membaca 4 baris acak, siswa lain menyimak, Guru menilai bacaan siswa di kartu Prestasi." /><button class="btn-act-rm">×</button></div>
-    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="Pada saat siswa membaca ada kesalahan, maka siswa lain langsung memberikan kode kesalahannya misal dengan suara (tut tut). Demikian seterusnya sampai selesai." /><button class="btn-act-rm">×</button></div>`;
+    <div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="" placeholder="Isi kegiatan BSK/BSP..." /><button class="btn-act-rm">×</button></div>`;
   $('p5-list').innerHTML = `
-    <div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="Guru mengakhiri pembelajaran dengan doa penutup dan salam" /><button class="btn-act-rm">×</button></div>`;
+    <div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Doa penutup dan salam" /><button class="btn-act-rm">×</button></div>`;
 
-  ['p1-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => refreshListLabels($(id)));
+  ['p1-list', 'p2-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => refreshListLabels($(id)));
 
   // Reset preview
   $('rpp-document').style.display = 'none';
   $('rpp-document').innerHTML = '';
   $('empty-state').style.display = 'flex';
+  
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
+  
   switchTab(0);
-  showToast('🔄 Form berhasil direset', 'info');
+  showToast('🔄 Form berhasil direset secara menyeluruh', 'info');
+});
+
+// ============================================================
+// SMART RESET
+// ============================================================
+$('btn-smart-reset')?.addEventListener('click', () => {
+  if (!confirm('Bersihkan data materi dan kegiatan (Identitas, Kelas, TTD akan tetap aman)?')) return;
+
+  // Clear specific form inputs
+  $('materi').value = '';
+  $('indikator').value = '';
+  
+  const currentPertemuan = parseInt($('pertemuan').value) || 0;
+  $('pertemuan').value = currentPertemuan + 1;
+
+  $('p3-penjelasan').value = '';
+  $('p3-pengulangan').value = '';
+  $('p3-catatan').value = '';
+
+  // Clear all dynamic lists to empty defaults
+  $('p1-list').innerHTML = `<div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Guru mengucapkan salam" /><button class="btn-act-rm">×</button></div>`;
+  $('p2-list').innerHTML = `<div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Apersepsi materi" /><button class="btn-act-rm">×</button></div>`;
+  $('p3-tiru-list').innerHTML = `<div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="" placeholder="Contoh: Baca Tiru 2 baris..." /><button class="btn-act-rm">×</button></div>`;
+  $('p4-list').innerHTML = `<div class="activity-item"><span class="act-label bullet">•</span><input type="text" class="act-input" value="" placeholder="Isi kegiatan BSK/BSP..." /><button class="btn-act-rm">×</button></div>`;
+  $('p5-list').innerHTML = `<div class="activity-item"><span class="act-label alpha">a.</span><input type="text" class="act-input" value="" placeholder="Contoh: Doa penutup dan salam" /><button class="btn-act-rm">×</button></div>`;
+
+  ['p1-list', 'p2-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => refreshListLabels($(id)));
+
+  // Reset preview panel
+  $('rpp-document').style.display = 'none';
+  $('rpp-document').innerHTML = '';
+  $('empty-state').style.display = 'flex';
+  
+  switchTab(0);
+  showToast('✨ Form dibersihkan! Identitas dipertahankan', 'success');
 });
 
 // ============================================================
@@ -622,165 +668,7 @@ $('btn-copy').addEventListener('click', () => {
   navigator.clipboard.writeText(doc.innerText).then(() => showToast('📋 Teks berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
 });
 
-// ============================================================
-// API KEY — Save / Load
-// ============================================================
-function loadApiKey() {
-  const k = localStorage.getItem(STORAGE_KEY);
-  if (k) {
-    $('gemini-api-key').value = k;
-    updateAiNote(true);
-  }
-}
-function updateAiNote(has) {
-  const note = $('ai-note');
-  if (has) { note.textContent = '✅ API Key tersimpan. Klik "Gunakan AI" untuk generate narasi otomatis.'; note.style.color = '#10b981'; }
-  else { note.textContent = 'Masukkan Gemini API Key di bagian atas untuk menggunakan fitur ini.'; note.style.color = ''; }
-}
-$('btn-save-key').addEventListener('click', () => {
-  const k = $('gemini-api-key').value.trim();
-  if (!k) { localStorage.removeItem(STORAGE_KEY); updateAiNote(false); showToast('🗑️ API Key dihapus', 'info'); return; }
-  localStorage.setItem(STORAGE_KEY, k);
-  updateAiNote(true);
-  showToast('🔑 API Key tersimpan!', 'success');
-});
 
-// ============================================================
-// AI ENHANCEMENT — Gemini API
-// ============================================================
-$('btn-ai-enhance').addEventListener('click', async () => {
-  const apiKey = localStorage.getItem(STORAGE_KEY) || $('gemini-api-key').value.trim();
-  if (!apiKey) { showToast('⚠️ Masukkan Gemini API Key terlebih dahulu!', 'error'); return; }
-
-  const d = collectData();
-  const btn = $('btn-ai-enhance');
-  const btnText = $('ai-btn-text');
-  const spinner = $('ai-spinner');
-
-  btn.disabled = true;
-  btnText.textContent = 'Memproses AI...';
-  spinner.classList.remove('hidden');
-
-  const prompt = `Kamu adalah pakar metode pembelajaran Al-Quran Wafa. 
-Buatkan konten RPP Wafa dengan format 5P untuk materi berikut:
-- Buku: ${d.buku}
-- Aspek: ${d.aspek}
-- Materi: ${d.materi}
-- Indikator: ${d.indikator}
-- Kelas: ${d.kelas}
-- Total waktu: ${d.waktuTotal} menit
-
-Tulis dalam format JSON yang VALID berikut ini (tanpa blok kode markdown, hanya JSON murni):
-{
-  "p1Activities": ["kegiatan a", "kegiatan b", "kegiatan c"],
-  "p2Kegiatan": "narasi apersepsi / cerita motivasi yang relevan dengan materi",
-  "p3Penjelasan": "penjelasan konsep materi secara singkat dan tepat",
-  "p3Pengulangan": "cara guru memberikan contoh bacaan dan memandu siswa",
-  "p3Catatan": "catatan variasi atau tips untuk guru",
-  "p3TiruSteps": ["langkah Baca Tiru 1", "langkah Baca Tiru 2", "langkah Baca Tiru 3"],
-  "p4Activities": ["kegiatan BSK 1", "kegiatan BSK 2"],
-  "p5Activities": ["Review materi yang dipelajari", "Pesan motivasi untuk siswa", "Doa penutup dan salam"]
-}
-
-Ketentuan penting:
-- Gunakan bahasa Indonesia yang baku, singkat, dan profesional
-- Sesuaikan dengan metode Wafa yang menggunakan pendekatan otak kanan
-- Semua teks harus relevan langsung dengan materi ${d.materi}`;
-
-  try {
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${getSelectedModel()}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.65, maxOutputTokens: 2048 },
-        }),
-      }
-    );
-
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error?.message || 'API Error ' + resp.status);
-    }
-
-    const result = await resp.json();
-    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Format respons AI tidak valid.');
-    const ai = JSON.parse(jsonMatch[0]);
-
-    // Apply AI values to form
-    if (ai.p2Kegiatan) $('p2-kegiatan').value = ai.p2Kegiatan;
-    if (ai.p3Penjelasan) $('p3-penjelasan').value = ai.p3Penjelasan;
-    if (ai.p3Pengulangan) $('p3-pengulangan').value = ai.p3Pengulangan;
-    if (ai.p3Catatan) $('p3-catatan').value = ai.p3Catatan;
-
-    // Update P1 list
-    if (ai.p1Activities?.length) {
-      const list = $('p1-list');
-      list.innerHTML = '';
-      ai.p1Activities.forEach((act, i) => {
-        const item = document.createElement('div');
-        item.className = 'activity-item';
-        item.innerHTML = `<span class="act-label">${String.fromCharCode(97 + i)}.</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
-        list.appendChild(item);
-      });
-      refreshListLabels(list);
-    }
-
-    // Update P3 Tiru list
-    if (ai.p3TiruSteps?.length) {
-      const list = $('p3-tiru-list');
-      list.innerHTML = '';
-      ai.p3TiruSteps.forEach(step => {
-        const item = document.createElement('div');
-        item.className = 'activity-item';
-        item.innerHTML = `<span class="act-label bullet">•</span><input type="text" class="act-input" value="${step.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
-        list.appendChild(item);
-      });
-      refreshListLabels(list);
-    }
-
-    // Update P4 list
-    if (ai.p4Activities?.length) {
-      const list = $('p4-list');
-      list.innerHTML = '';
-      ai.p4Activities.forEach(act => {
-        const item = document.createElement('div');
-        item.className = 'activity-item';
-        item.innerHTML = `<span class="act-label bullet">•</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
-        list.appendChild(item);
-      });
-      refreshListLabels(list);
-    }
-
-    // Update P5 list
-    if (ai.p5Activities?.length) {
-      const list = $('p5-list');
-      list.innerHTML = '';
-      ai.p5Activities.forEach((act, i) => {
-        const item = document.createElement('div');
-        item.className = 'activity-item';
-        item.innerHTML = `<span class="act-label alpha">${String.fromCharCode(97 + i)}.</span><input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
-        list.appendChild(item);
-      });
-      refreshListLabels(list);
-    }
-
-    generateAndShow();
-    showToast('🤖 RPP berhasil diperkaya dengan AI!', 'success');
-
-  } catch (err) {
-    console.error(err);
-    showToast('❌ ' + err.message, 'error', 5000);
-  } finally {
-    btn.disabled = false;
-    btnText.textContent = '✨ Gunakan AI';
-    spinner.classList.add('hidden');
-  }
-});
 
 // ============================================================
 // KANTONG — Sistem Multi-Halaman RPP
@@ -973,7 +861,7 @@ renderKantong();
 switchTab(0);
 
 // Initialize all existing lists (after BSK/BSP setup)
-['p1-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => {
+['p1-list', 'p2-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => {
   const el = $(id);
   if (el) refreshListLabels(el);
 });
