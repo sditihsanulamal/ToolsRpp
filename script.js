@@ -368,20 +368,22 @@ function buildRPPHtml(d) {
 
   const sigRow = `
     <div class="wafa-footer">
-      <div class="wafa-sig-row">
-        <div class="wafa-sig-block">
-          <div>Mengetahui,</div>
-          <div>${escHtml(d.ksJabatan)}</div>
-          <div class="wafa-sig-name">${escHtml(d.ksNama)}</div>
-          ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
-        </div>
-        <div class="wafa-sig-block">
-          <div>${tanggalStr}</div>
-          <div>Guru Wafa</div>
-          <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
-          ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
-        </div>
-      </div>
+      <table class="wafa-sig-table">
+        <tr>
+          <td class="wafa-sig-block">
+            <div>Mengetahui,</div>
+            <div>${escHtml(d.ksJabatan)}</div>
+            <div class="wafa-sig-name">${escHtml(d.ksNama)}</div>
+            ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
+          </td>
+          <td class="wafa-sig-block">
+            <div>${tanggalStr}</div>
+            <div>Guru Wafa</div>
+            <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
+            ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
+          </td>
+        </tr>
+      </table>
     </div>`;
 
   return `
@@ -506,8 +508,6 @@ function updatePreviewHtml(overrides = null) {
   const doc = $('rpp-document');
   const empty = $('empty-state');
   doc.innerHTML = html;
-  doc.contentEditable = 'true';
-  doc.style.outline = 'none';
   doc.style.display = 'block';
   empty.style.display = 'none';
 }
@@ -643,8 +643,38 @@ $('btn-smart-reset')?.addEventListener('click', () => {
   $('rpp-document').innerHTML = '';
   $('empty-state').style.display = 'flex';
   
+  // Return to form view
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
   switchTab(0);
   showToast('✨ Form dibersihkan! Identitas dipertahankan', 'success');
+});
+
+// Header shortcut: "Halaman Baru" (same as smart reset)
+$('btn-smart-reset-hdr')?.addEventListener('click', () => {
+  // Clear materi/kegiatan without touching identitas/TTD
+  $('materi').value = '';
+  $('indikator').value = '';
+  const currentPertemuan = parseInt($('pertemuan').value) || 0;
+  $('pertemuan').value = currentPertemuan + 1;
+  $('p3-penjelasan').value = '';
+  $('p3-pengulangan').value = '';
+  $('p3-catatan').value = '';
+  ['p1-list','p2-list','p3-tiru-list','p4-list','p5-list'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    const isBullet = el.querySelector('.act-label')?.classList.contains('bullet');
+    el.innerHTML = `<div class="activity-item"><span class="act-label ${isBullet?'bullet':'alpha'}">${isBullet?'•':'a.'}</span><input type="text" class="act-input" value="" placeholder="Ketik kegiatan..." /><button class="btn-act-rm">×</button></div>`;
+    refreshListLabels(el);
+  });
+  $('rpp-document').style.display = 'none';
+  $('rpp-document').innerHTML = '';
+  $('rpp-document').contentEditable = 'false';
+  $('empty-state').style.display = 'flex';
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
+  switchTab(0);
+  showToast('✨ Siap membuat halaman baru! Identitas dipertahankan', 'success');
 });
 
 // ============================================================
@@ -793,9 +823,6 @@ function previewSinglePage(id) {
   const html = page.content || buildRPPHtml(page.formData);
   const doc = $('rpp-document');
   doc.innerHTML = html;
-  doc.contentEditable = 'true';
-  doc.style.outline = 'none';
-  doc.className = 'rpp-document';
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
   $('preview-body').scrollTop = 0;
@@ -825,9 +852,6 @@ function previewAllPages() {
   `).join('');
   const doc = $('rpp-document');
   doc.innerHTML = allHtml;
-  doc.contentEditable = 'true';
-  doc.style.outline = 'none';
-  doc.className = 'rpp-document multi-page';
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
   $('preview-body').scrollTop = 0;
@@ -961,7 +985,7 @@ $('btn-clear-kantong')?.addEventListener('click', () => {
 $('rpp-document')?.addEventListener('input', () => {
   if (currentPreviewId && currentPreviewId !== 'all') {
     const pages = getKantong();
-    const idx = pages.findIndex(p => p.id === currentPreviewId);
+    const idx = pages.findIndex(p => p.id === Number(currentPreviewId));
     if (idx !== -1) {
       pages[idx].content = $('rpp-document').innerHTML;
       saveKantong(pages);
@@ -972,7 +996,6 @@ $('rpp-document')?.addEventListener('input', () => {
 // ============================================================
 // INIT
 // ============================================================
-loadApiKey();
 loadLogo();
 renderKantong();
 switchTab(0);

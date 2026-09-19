@@ -373,11 +373,21 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 
 /* Footer / TTD */
 .wafa-footer { margin-top: 10px; font-size: 10.5pt; }
-.wafa-footer-date { text-align: right; margin-bottom: 12px; }
-.wafa-sig-row { display: flex; justify-content: space-between; }
-.wafa-sig-block { text-align: center; width: 45%; }
-.wafa-sig-name { font-weight: bold; border-top: 1px solid #1a1a1a; padding-top: 4px; margin-top: 52px; font-size: 10.5pt; }
-.wafa-sig-nip { font-size: 10pt; color: #444; }
+.wafa-sig-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+  table-layout: fixed;
+}
+.wafa-sig-block {
+  text-align: center;
+  width: 50%;
+  padding: 0 8px;
+  vertical-align: top;
+  border: none;
+}
+.wafa-sig-name { font-weight: bold; border-top: 1px solid #1a1a1a; padding-top: 4px; margin-top: 52px; font-size: 10.5pt; display: block; }
+.wafa-sig-nip { font-size: 10pt; color: #444; display: block; }
 
 /* === PREVIEW PANEL override for kantong layout === */
 .panel-preview { background: var(--clr-bg-base); display: flex; flex-direction: column; overflow: hidden; }
@@ -578,7 +588,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
    PRINT STYLES
    ============================================= */
 @media print {
-  @page { margin: 0mm; }
+  @page { margin: 1.5cm 2cm; }
   
   html, body {
     width: auto !important;
@@ -592,9 +602,16 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   
   *, *:before, *:after {
     box-sizing: border-box !important;
+    /* Prevent contenteditable artifacts */
+    outline: none !important;
+    -webkit-user-modify: read-only !important;
   }
+
+  /* Remove any contenteditable styling artifacts */
+  [contenteditable] { outline: none !important; border: none !important; }
   
-  .app-header, .panel-form, .preview-toolbar, .kantong-bar, .kantong-chips, .empty-state, .toast { display: none !important; }
+  .app-header, .panel-form, .preview-toolbar, .kantong-bar, .kantong-chips, .empty-state, .toast,
+  .rpp-page-break { display: none !important; }
   
   .app-main, .panel-preview, .preview-body { 
     display: block !important; 
@@ -611,12 +628,13 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   .rpp-document:not(.multi-page) { 
     box-shadow: none !important; 
     border-radius: 0 !important; 
-    padding: 1.5cm 2cm !important; 
+    padding: 0 !important; 
     max-width: none !important;
     width: auto !important;
     margin: 0 !important; 
     animation: none !important; 
     overflow: visible !important;
+    background: white !important;
   }
 
   /* Multi-page */
@@ -633,20 +651,29 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   .rpp-document.multi-page .rpp-page-wrapper { 
     box-shadow: none !important; 
     border-radius: 0 !important; 
-    padding: 1.5cm 2cm !important; 
+    padding: 0 !important;
     page-break-after: always !important; 
     break-after: page !important; 
     margin: 0 !important; 
     overflow: visible !important;
     width: auto !important;
+    background: white !important;
   }
   .rpp-document.multi-page .rpp-page-wrapper:last-child { 
     page-break-after: auto !important; 
     break-after: auto !important; 
   }
-  .rpp-page-break { display: none !important; }
 
-  .wafa-main-table th, .wafa-main-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Fix signature table for print */
+  .wafa-sig-table { width: 100% !important; border: none !important; table-layout: fixed !important; }
+  .wafa-sig-block { border: none !important; width: 50% !important; }
+  .wafa-sig-name { margin-top: 52px !important; }
+
+  .wafa-main-table th, .wafa-main-table td {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
 }
 
 /* =============================================
