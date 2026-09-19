@@ -506,6 +506,8 @@ function updatePreviewHtml(overrides = null) {
   const doc = $('rpp-document');
   const empty = $('empty-state');
   doc.innerHTML = html;
+  doc.contentEditable = 'true';
+  doc.style.outline = 'none';
   doc.style.display = 'block';
   empty.style.display = 'none';
 }
@@ -690,7 +692,8 @@ function addToKantong() {
   pages.push({
     id: Date.now(),
     label,
-    formData: d, // simpan data form, bukan HTML — lebih hemat storage
+    formData: d, // simpan data form agar bisa diload kembali
+    content: doc.innerHTML, // simpan HTML agar editan langsung tersimpan
     savedAt: new Date().toLocaleString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
   });
   saveKantong(pages);
@@ -784,9 +787,11 @@ window.loadPageToForm = loadPageToForm;
 function previewSinglePage(id) {
   const page = getKantong().find(p => p.id === Number(id));
   if (!page) return;
-  const html = buildRPPHtml(page.formData);
+  const html = page.content || buildRPPHtml(page.formData);
   const doc = $('rpp-document');
   doc.innerHTML = html;
+  doc.contentEditable = 'true';
+  doc.style.outline = 'none';
   doc.className = 'rpp-document';
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
@@ -809,11 +814,13 @@ function previewAllPages() {
   const pages = getKantong();
   if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
   const allHtml = pages.map((p, i) => `
-    <div class="rpp-page-wrapper">${buildRPPHtml(p.formData)}</div>
-    ${i < pages.length - 1 ? `<div class="rpp-page-break"><span>― Halaman ${i + 2} ―</span></div>` : ''}
+    <div class="rpp-page-wrapper">${p.content || buildRPPHtml(p.formData)}</div>
+    ${i < pages.length - 1 ? `<div class="rpp-page-break" contenteditable="false"><span>― Halaman ${i + 2} ―</span></div>` : ''}
   `).join('');
   const doc = $('rpp-document');
   doc.innerHTML = allHtml;
+  doc.contentEditable = 'true';
+  doc.style.outline = 'none';
   doc.className = 'rpp-document multi-page';
   doc.style.display = 'block';
   $('empty-state').style.display = 'none';
@@ -870,7 +877,7 @@ function exportToWord() {
   </style>`;
 
   const allPages = pages.map((p, i) => `
-    <div>${buildRPPHtml(p.formData)}</div>
+    <div>${p.content || buildRPPHtml(p.formData)}</div>
     ${i < pages.length - 1 ? '<div style="page-break-after:always"></div>' : ''}
   `).join('');
 
@@ -933,12 +940,21 @@ $('btn-preview-all')?.addEventListener('click', previewAllPages);
 $('btn-print-all')?.addEventListener('click', printAllPages);
 $('btn-export-word')?.addEventListener('click', exportToWord);
 $('btn-clear-kantong')?.addEventListener('click', () => {
-  const n = getKantong().length;
-  if (!n) return;
-  if (!confirm(`Hapus semua ${n} halaman dari Kantong? Tindakan ini tidak bisa dibatalkan.`)) return;
-  localStorage.removeItem(KANTONG_KEY);
-  renderKantong();
-  showToast('\ud83d\uddd1\ufe0f Kantong dikosongkan', 'info');
+  if (confirm('Hapus semua halaman di kantong?')) {
+    saveKantong([]); renderKantong();
+  }
+});
+
+// Autosave manual edits in preview
+$('rpp-document')?.addEventListener('input', () => {
+  if (currentPreviewId && currentPreviewId !== 'all') {
+    const pages = getKantong();
+    const idx = pages.findIndex(p => p.id === currentPreviewId);
+    if (idx !== -1) {
+      pages[idx].content = $('rpp-document').innerHTML;
+      saveKantong(pages);
+    }
+  }
 });
 
 // ============================================================
