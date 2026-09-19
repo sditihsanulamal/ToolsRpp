@@ -372,20 +372,9 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 .sarana-item:last-child { border-bottom: none; padding-bottom: 0; }
 
 /* Footer / TTD */
-.wafa-footer { margin-top: 10px; font-size: 10.5pt; }
-.wafa-sig-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: none;
-  table-layout: fixed;
-}
-.wafa-sig-block {
-  text-align: center;
-  width: 50%;
-  padding: 0 8px;
-  vertical-align: top;
-  border: none;
-}
+.wafa-footer { margin-top: 16px; font-size: 10.5pt; }
+.wafa-sig-row { display: flex; justify-content: space-between; width: 100%; }
+.wafa-sig-block { text-align: center; width: 48%; }
 .wafa-sig-name { font-weight: bold; border-top: 1px solid #1a1a1a; padding-top: 4px; margin-top: 52px; font-size: 10.5pt; display: block; }
 .wafa-sig-nip { font-size: 10pt; color: #444; display: block; }
 
@@ -589,91 +578,90 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
    ============================================= */
 @media print {
   @page { margin: 1.5cm 2cm; }
-  
+
+  /* Hide all UI chrome */
+  .app-header, .panel-form, .preview-toolbar,
+  .kantong-bar, .kantong-chips, .empty-state,
+  .toast, .rpp-page-break { display: none !important; }
+
   html, body {
-    width: auto !important;
-    height: auto !important;
     background: white !important;
-    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-    box-sizing: border-box !important;
-  }
-  
-  *, *:before, *:after {
-    box-sizing: border-box !important;
-    /* Prevent contenteditable artifacts */
-    outline: none !important;
-    -webkit-user-modify: read-only !important;
+    overflow: visible !important;
   }
 
-  /* Remove any contenteditable styling artifacts */
-  [contenteditable] { outline: none !important; border: none !important; }
-  
-  .app-header, .panel-form, .preview-toolbar, .kantong-bar, .kantong-chips, .empty-state, .toast,
-  .rpp-page-break { display: none !important; }
-  
-  .app-main, .panel-preview, .preview-body { 
-    display: block !important; 
-    height: auto !important; 
+  .app-main, .panel-preview, .preview-body {
+    display: block !important;
+    height: auto !important;
     max-height: none !important;
-    width: auto !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important; 
+    overflow: visible !important;
     position: static !important;
   }
 
-  /* Single page */
-  .rpp-document:not(.multi-page) { 
-    box-shadow: none !important; 
-    border-radius: 0 !important; 
-    padding: 0 !important; 
-    max-width: none !important;
-    width: auto !important;
-    margin: 0 !important; 
-    animation: none !important; 
-    overflow: visible !important;
-    background: white !important;
-  }
-
-  /* Multi-page */
-  .rpp-document.multi-page { 
-    background: transparent !important; 
-    box-shadow: none !important; 
-    padding: 0 !important; 
-    display: block !important; 
-    margin: 0 !important;
-    max-width: none !important;
-    width: auto !important;
-    overflow: visible !important;
-  }
-  .rpp-document.multi-page .rpp-page-wrapper { 
-    box-shadow: none !important; 
-    border-radius: 0 !important; 
+  /* Single page document */
+  .rpp-document:not(.multi-page) {
+    display: block !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
     padding: 0 !important;
-    page-break-after: always !important; 
-    break-after: page !important; 
-    margin: 0 !important; 
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
     overflow: visible !important;
-    width: auto !important;
     background: white !important;
-  }
-  .rpp-document.multi-page .rpp-page-wrapper:last-child { 
-    page-break-after: auto !important; 
-    break-after: auto !important; 
+    animation: none !important;
   }
 
-  /* Fix signature table for print */
-  .wafa-sig-table { width: 100% !important; border: none !important; table-layout: fixed !important; }
-  .wafa-sig-block { border: none !important; width: 50% !important; }
-  .wafa-sig-name { margin-top: 52px !important; }
+  /* Multi-page container */
+  .rpp-document.multi-page {
+    display: block !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
 
-  .wafa-main-table th, .wafa-main-table td {
+  /* Each page in multi-page */
+  .rpp-document.multi-page .rpp-page-wrapper {
+    display: block !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+    background: white !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  .rpp-document.multi-page .rpp-page-wrapper:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Fix signature for print — override flex to ensure side-by-side */
+  .wafa-sig-row {
+    display: table !important;
+    width: 100% !important;
+  }
+  .wafa-sig-block {
+    display: table-cell !important;
+    width: 50% !important;
+    text-align: center !important;
+    vertical-align: top !important;
+  }
+
+  /* Color accuracy */
+  * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
 }
 
 /* =============================================
@@ -686,7 +674,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   
   .app-header { flex-direction: column; align-items: stretch; height: auto; padding: 12px 16px; gap: 12px; }
   .header-left { width: 100%; justify-content: flex-start; }
-  .header-right { width: 100%; justify-content: space-between; gap: 8px; }
+  .header-right { width: 100%; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
   
   /* Tabs */
   .tab-nav { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
@@ -701,33 +689,30 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   
   /* Toolbar & Actions */
   .preview-toolbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; height: auto; }
-  .preview-tools { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; justify-content: space-between; }
+  .preview-tools { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .preview-tools .btn-preview-tool { width: 100%; justify-content: center; }
   
   .kantong-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
   .kantong-actions-row { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .btn-kantong-action, .btn-kantong-danger { width: 100%; justify-content: center; }
   
-  /* Document preview */
-  .preview-body { padding: 10px; }
-  .rpp-document { padding: 15px !important; overflow-x: auto; }
-  .rpp-document.multi-page .rpp-page-wrapper { padding: 15px !important; overflow-x: auto; }
-  
+  /* Document preview — allow horizontal scroll so it doesn't crush the table */
+  .preview-body { padding: 8px; }
+  .rpp-document, .rpp-document.multi-page .rpp-page-wrapper {
+    padding: 15px !important;
+    min-width: 320px;
+    overflow-x: auto;
+  }
+
   /* Activities */
   .activity-item { flex-wrap: wrap; }
   .act-input { min-width: 0; width: 100%; }
-  
-  /* Table & Signatures */
-  .wafa-main-table { font-size: 0.8rem; min-width: 500px; /* force scroll if too small */ }
-  .wafa-sig-row { flex-direction: column; gap: 20px; align-items: center; }
-  .wafa-sig-block { width: 100%; max-width: none; text-align: center; }
 }
 
 @media screen and (max-width: 480px) {
   .header-right { flex-direction: column; }
-  .btn-header { width: 100%; justify-content: center; }
-  
   .preview-tools, .kantong-actions-row { grid-template-columns: 1fr; }
   .tab-nav-footer { flex-direction: column; gap: 10px; }
   .btn-tab-prev, .btn-tab-next { width: 100%; justify-content: center; }
 }
+

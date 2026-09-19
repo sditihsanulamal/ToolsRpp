@@ -368,22 +368,20 @@ function buildRPPHtml(d) {
 
   const sigRow = `
     <div class="wafa-footer">
-      <table class="wafa-sig-table">
-        <tr>
-          <td class="wafa-sig-block">
-            <div>Mengetahui,</div>
-            <div>${escHtml(d.ksJabatan)}</div>
-            <div class="wafa-sig-name">${escHtml(d.ksNama)}</div>
-            ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
-          </td>
-          <td class="wafa-sig-block">
-            <div>${tanggalStr}</div>
-            <div>Guru Wafa</div>
-            <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
-            ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
-          </td>
-        </tr>
-      </table>
+      <div class="wafa-sig-row">
+        <div class="wafa-sig-block">
+          <div>Mengetahui,</div>
+          <div>${escHtml(d.ksJabatan)}</div>
+          <div class="wafa-sig-name">${escHtml(d.ksNama)}</div>
+          ${d.ksNip ? `<div class="wafa-sig-nip">NIP. ${escHtml(d.ksNip)}</div>` : ''}
+        </div>
+        <div class="wafa-sig-block">
+          <div>${tanggalStr}</div>
+          <div>Guru Wafa</div>
+          <div class="wafa-sig-name">${escHtml(d.guruNama)}</div>
+          ${d.guruNip ? `<div class="wafa-sig-nip">${escHtml(d.guruNip)}</div>` : ''}
+        </div>
+      </div>
     </div>`;
 
   return `
