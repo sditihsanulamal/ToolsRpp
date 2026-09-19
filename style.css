@@ -581,10 +581,21 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 
 /* Responsive */
 @media (max-width: 900px) {
-  .app-main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow: auto; }
+  .app-main { display: flex; flex-direction: column; height: auto; overflow: visible; }
   body { overflow: auto; }
-  .panel-form { height: auto; max-height: 58vh; }
-  .panel-preview { height: 500px; }
-  .ttd-grid { grid-template-columns: 1fr; }
-  .ai-key-wrapper input { width: 130px; }
+  
+  .app-header { flex-direction: column; align-items: stretch; height: auto; padding: 12px 16px; gap: 12px; }
+  .header-left { width: 100%; justify-content: flex-start; }
+  .header-right { width: 100%; justify-content: space-between; }
+  .ai-key-wrapper { flex: 1; justify-content: space-between; }
+  .ai-key-wrapper input { width: 100%; min-width: 80px; }
+  
+  .panel-form { height: auto; max-height: none; width: 100%; border-right: none; border-bottom: 2px solid var(--clr-border); }
+  .tab-panel { overflow-y: visible; max-height: none; height: auto; }
+  
+  .panel-preview { height: 800px; width: 100%; }
+  .form-grid, .form-grid-2, .ttd-grid { grid-template-columns: 1fr; }
+  
+  .kantong-actions-row { width: 100%; justify-content: space-between; }
+  .btn-kantong-action { flex: 1; justify-content: center; }
 }
