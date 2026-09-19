@@ -458,11 +458,13 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 .chip-label { font-size: 0.73rem; font-weight: 600; color: var(--clr-text-primary); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
 .chip-time { font-size: 0.6rem; color: var(--clr-text-muted); line-height: 1.2; }
 .chip-actions { display: flex; gap: 3px; }
-.btn-chip-view, .btn-chip-del {
+.btn-chip-load, .btn-chip-view, .btn-chip-del {
   width: 20px; height: 20px; border-radius: 50%; border: none;
   font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 150ms ease; line-height: 1;
 }
+.btn-chip-load { background: rgba(245,158,11,0.12); color: var(--clr-amber); }
+.btn-chip-load:hover { background: var(--clr-amber); color: white; transform: scale(1.15); }
 .btn-chip-view { background: var(--clr-accent-glow); color: var(--clr-accent); }
 .btn-chip-view:hover { background: var(--clr-accent-dark); color: white; transform: scale(1.15); }
 .btn-chip-del { background: rgba(244,63,94,0.1); color: #fb7185; font-size: 13px; }

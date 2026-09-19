@@ -177,22 +177,7 @@ document.addEventListener('click', (e) => {
   if (type !== p4Mode) switchP4Mode(type);
 });
 
-// ============================================================
-// GET SELECTED GEMINI MODEL
-// ============================================================
-function getSelectedModel() {
-  const sel = $('gemini-model');
-  if (!sel) return 'gemini-2.0-flash';
-  if (sel.value === 'custom') {
-    return $('gemini-model-custom')?.value.trim() || 'gemini-2.0-flash';
-  }
-  return sel.value;
-}
-// Model custom input toggle
-$('gemini-model')?.addEventListener('change', (e) => {
-  const c = $('gemini-model-custom');
-  if (c) c.style.display = e.target.value === 'custom' ? 'block' : 'none';
-});
+
 
 // ============================================================
 // LOGO UPLOAD & DISPLAY
@@ -713,6 +698,79 @@ function deleteFromKantong(id) {
 }
 window.deleteFromKantong = deleteFromKantong;
 
+/** Muat data kantong kembali ke form (Duplikasi/Copy) */
+function loadPageToForm(id) {
+  const page = getKantong().find(p => p.id === Number(id));
+  if (!page) return;
+  if (!confirm(`Timpakan data dari "${page.label}" ke form saat ini? Data yang belum di-generate mungkin hilang.`)) return;
+
+  const d = page.formData;
+  
+  // Text Inputs
+  $('materi').value = d.materi || '';
+  $('indikator').value = d.indikator || '';
+  $('pertemuan').value = d.pertemuan || '1';
+  $('kelas').value = d.kelas || '';
+  $('semester').value = d.semester || '1';
+  $('waktu-total').value = d.waktuTotal || '50';
+  
+  $('p1-waktu').value = d.p1Waktu || '5';
+  $('p2-waktu').value = d.p2Waktu || '5';
+  $('p3-sub').value = d.p3Sub || 'Penanaman Konsep';
+  $('p3-penjelasan').value = d.p3Penjelasan || '';
+  $('p3-pengulangan').value = d.p3Pengulangan || '';
+  $('p3-catatan').value = d.p3Catatan || '';
+  $('p3-waktu').value = d.p3Waktu || '20';
+  $('p4-waktu').value = d.p4Waktu || '15';
+  $('p5-waktu').value = d.p5Waktu || '5';
+  
+  // TTD
+  if (d.ttdKota !== undefined) $('ttd-kota').value = d.ttdKota;
+  if (d.ttdTanggal !== undefined) $('ttd-tanggal').value = d.ttdTanggal;
+  if (d.ksJabatan !== undefined) $('ks-jabatan').value = d.ksJabatan;
+  if (d.ksNama !== undefined) $('ks-nama').value = d.ksNama;
+  if (d.ksNip !== undefined) $('ks-nip').value = d.ksNip;
+  if (d.guruNama !== undefined) $('guru-nama').value = d.guruNama;
+  if (d.guruNip !== undefined) $('guru-nip').value = d.guruNip;
+
+  // Lists
+  const renderList = (idStr, acts, type = 'bullet') => {
+    const list = $(idStr);
+    if (!list) return;
+    list.innerHTML = '';
+    if (!acts || !acts.length) acts = [''];
+    acts.forEach((act, i) => {
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      let labelHtml = type === 'bullet' ? '<span class="act-label bullet">•</span>' : `<span class="act-label alpha">${String.fromCharCode(97 + i)}.</span>`;
+      item.innerHTML = `${labelHtml}<input type="text" class="act-input" value="${act.replace(/"/g, '&quot;')}" /><button class="btn-act-rm">×</button>`;
+      list.appendChild(item);
+    });
+    refreshListLabels(list);
+  };
+
+  renderList('p1-list', d.p1Activities, 'alpha');
+  renderList('p2-list', d.p2Activities, 'alpha');
+  renderList('p3-tiru-list', d.p3TiruSteps, 'bullet');
+  renderList('p4-list', d.p4Activities, 'bullet');
+  renderList('p5-list', d.p5Activities, 'alpha');
+  
+  // BSK / BSP
+  if (d.p4Sub && d.p4Sub.includes('BSP')) {
+    if (typeof switchP4Mode === 'function') switchP4Mode('BSP');
+  } else {
+    if (typeof switchP4Mode === 'function') switchP4Mode('BSK');
+  }
+  
+  // Go back to form
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
+  switchTab(0);
+  
+  showToast(`📋 Berhasil memuat data dari Kantong!`, 'success');
+}
+window.loadPageToForm = loadPageToForm;
+
 /** Preview satu halaman tertentu dari kantong */
 function previewSinglePage(id) {
   const page = getKantong().find(p => p.id === Number(id));
@@ -831,6 +889,7 @@ function renderKantong() {
         <span class="chip-time">${p.savedAt}</span>
       </div>
       <div class="chip-actions">
+        <button class="btn-chip-load" onclick="loadPageToForm(${p.id})" title="Copy / Muat ke Form">📝</button>
         <button class="btn-chip-view" onclick="previewSinglePage(${p.id})" title="Preview halaman ini">👁</button>
         <button class="btn-chip-del" onclick="if(confirm('Hapus halaman ini dari kantong?')) deleteFromKantong(${p.id})" title="Hapus">×</button>
       </div>
