@@ -643,7 +643,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
 /* =============================================
    RESPONSIVE MOBILE UI (Optimized)
    ============================================= */
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
   .app-main { padding: 10px; }
   .panel-form { border-radius: var(--radius-md); }
   .tab-panel { padding: 12px; }
@@ -687,7 +687,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   .wafa-sig-block { width: 100%; max-width: none; text-align: center; }
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
   .header-right { flex-direction: column; }
   .btn-header { width: 100%; justify-content: center; }
   
