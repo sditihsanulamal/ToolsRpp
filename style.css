@@ -610,6 +610,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
     max-width: none !important; 
     margin: 0 !important; 
     animation: none !important; 
+    overflow: visible !important;
   }
 
   /* Multi-page */
@@ -619,18 +620,20 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
     padding: 0 !important; 
     display: block !important; 
     margin: 0 !important;
+    overflow: visible !important;
   }
   .rpp-document.multi-page .rpp-page-wrapper { 
     box-shadow: none !important; 
     border-radius: 0 !important; 
     padding: 1.5cm 2cm !important; 
-    page-break-after: always; 
-    break-after: page; 
+    page-break-after: always !important; 
+    break-after: page !important; 
     margin: 0 !important; 
+    overflow: visible !important;
   }
   .rpp-document.multi-page .rpp-page-wrapper:last-child { 
-    page-break-after: auto; 
-    break-after: auto; 
+    page-break-after: auto !important; 
+    break-after: auto !important; 
   }
   .rpp-page-break { display: none !important; }
 
