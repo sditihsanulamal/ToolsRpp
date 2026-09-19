@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tools RPP — Generator Modul Ajar Kurikulum Merdeka</title>
+  <meta name="description" content="Generator Modul Ajar & RPP Kurikulum Merdeka otomatis untuk guru. Isi form, preview langsung, dan ekspor PDF dalam hitungan menit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header" id="app-header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="8" fill="url(#grad1)"/>
+          <path d="M7 9h14M7 14h10M7 19h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="21" cy="19" r="3" fill="#fff" fill-opacity="0.9"/>
+          <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#10b981"/>
+              <stop offset="1" stop-color="#059669"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1 class="brand-title">Tools RPP</h1>
+        <span class="brand-sub">Generator Modul Ajar Otomatis</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="ai-key-wrapper" id="ai-key-wrapper">
+        <svg class="key-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M12 15h8m-4-4v8"/></svg>
+        <input type="password" id="gemini-api-key" placeholder="Gemini API Key (opsional)" autocomplete="off" />
+        <button class="btn-save-key" id="btn-save-key" title="Simpan Key">Simpan</button>
+      </div>
+      <button class="btn-secondary" id="btn-reset" title="Reset semua form">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset
+      </button>
+      <button class="btn-primary btn-export" id="btn-export" title="Cetak / Ekspor PDF">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Cetak / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <main class="app-main" id="app-main">
+
+    <!-- ===== LEFT PANEL: FORM ===== -->
+    <aside class="panel-form" id="panel-form">
+
+      <!-- Progress bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <nav class="tab-nav" id="tab-nav" role="tablist">
+        <button class="tab-btn active" data-tab="0" role="tab" aria-selected="true" id="tab-btn-0">
+          <span class="tab-num">1</span>
+          <span class="tab-label">Identitas</span>
+        </button>
+        <button class="tab-btn" data-tab="1" role="tab" aria-selected="false" id="tab-btn-1">
+          <span class="tab-num">2</span>
+          <span class="tab-label">Materi</span>
+        </button>
+        <button class="tab-btn" data-tab="2" role="tab" aria-selected="false" id="tab-btn-2">
+          <span class="tab-num">3</span>
+          <span class="tab-label">Kegiatan</span>
+        </button>
+        <button class="tab-btn" data-tab="3" role="tab" aria-selected="false" id="tab-btn-3">
+          <span class="tab-num">4</span>
+          <span class="tab-label">Asesmen</span>
+        </button>
+      </nav>
+
+      <!-- Form Content -->
+      <div class="form-body" id="form-body">
+
+        <!-- TAB 0: IDENTITAS -->
+        <section class="tab-panel active" data-panel="0" id="panel-0">
+          <div class="form-section-header">
+            <div class="section-icon">🏫</div>
+            <div>
+              <h2 class="section-title">Identitas Sekolah & Guru</h2>
+              <p class="section-desc">Informasi dasar dokumen Modul Ajar</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="nama-sekolah">Nama Sekolah</label>
+              <input type="text" id="nama-sekolah" placeholder="Contoh: SMP Negeri 1 Jakarta" />
+            </div>
+            <div class="form-group full">
+              <label for="nama-guru">Nama Guru Penyusun</label>
+              <input type="text" id="nama-guru" placeholder="Contoh: Dra. Siti Rahayu, M.Pd." />
+            </div>
+            <div class="form-group">
+              <label for="mata-pelajaran">Mata Pelajaran</label>
+              <input type="text" id="mata-pelajaran" placeholder="Contoh: Ilmu Pengetahuan Alam" />
+            </div>
+            <div class="form-group">
+              <label for="fase">Fase / Kelas</label>
+              <select id="fase">
+                <option value="">— Pilih Fase —</option>
+                <option value="Fase A / Kelas 1-2 SD">Fase A / Kelas 1-2 SD</option>
+                <option value="Fase B / Kelas 3-4 SD">Fase B / Kelas 3-4 SD</option>
+                <option value="Fase C / Kelas 5-6 SD">Fase C / Kelas 5-6 SD</option>
+                <option value="Fase D / Kelas 7 SMP">Fase D / Kelas 7 SMP</option>
+                <option value="Fase D / Kelas 8 SMP">Fase D / Kelas 8 SMP</option>
+                <option value="Fase D / Kelas 9 SMP">Fase D / Kelas 9 SMP</option>
+                <option value="Fase E / Kelas 10 SMA">Fase E / Kelas 10 SMA</option>
+                <option value="Fase F / Kelas 11 SMA">Fase F / Kelas 11 SMA</option>
+                <option value="Fase F / Kelas 12 SMA">Fase F / Kelas 12 SMA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="semester">Semester</label>
+              <select id="semester">
+                <option value="Ganjil">Ganjil</option>
+                <option value="Genap">Genap</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tahun-pelajaran">Tahun Pelajaran</label>
+              <input type="text" id="tahun-pelajaran" placeholder="2025/2026" />
+            </div>
+            <div class="form-group">
+              <label for="jml-pertemuan">Jumlah Pertemuan</label>
+              <input type="number" id="jml-pertemuan" min="1" max="20" value="2" placeholder="2" />
+            </div>
+            <div class="form-group">
+              <label for="jp-per-pertemuan">JP per Pertemuan</label>
+              <input type="number" id="jp-per-pertemuan" min="1" max="10" value="2" placeholder="2" />
+            </div>
+            <div class="form-group">
+              <label for="menit-per-jp">Menit per JP</label>
+              <select id="menit-per-jp">
+                <option value="35">35 menit (SD)</option>
+                <option value="40">40 menit (SMP)</option>
+                <option value="45" selected>45 menit (SMA/SMK)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="jml-peserta">Jumlah Peserta Didik</label>
+              <input type="number" id="jml-peserta" min="1" max="50" value="32" placeholder="32" />
+            </div>
+          </div>
+
+          <div class="tab-nav-footer">
+            <div></div>
+            <button class="btn-tab-next" data-next="1" id="next-0">Selanjutnya →</button>
+          </div>
+        </section>
+
+        <!-- TAB 1: MATERI -->
+        <section class="tab-panel" data-panel="1" id="panel-1">
+          <div class="form-section-header">
+            <div class="section-icon">📚</div>
+            <div>
+              <h2 class="section-title">Materi & Tujuan Pembelajaran</h2>
+              <p class="section-desc">Kompetensi dan target pencapaian peserta didik</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="judul-modul">Judul Modul / Materi Pokok</label>
+              <input type="text" id="judul-modul" placeholder="Contoh: Fotosintesis dan Peran Cahaya Matahari" />
+            </div>
+            <div class="form-group full">
+              <label for="elemen-cp">Elemen Capaian Pembelajaran</label>
+              <textarea id="elemen-cp" rows="3" placeholder="Contoh: Peserta didik mampu memahami proses fotosintesis sebagai mekanisme tumbuhan dalam mengubah energi cahaya menjadi energi kimia..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="tujuan-pembelajaran">Tujuan Pembelajaran</label>
+              <div class="tp-list" id="tp-list">
+                <div class="tp-item" data-index="0">
+                  <span class="tp-num">1.</span>
+                  <input type="text" class="tp-input" placeholder="Contoh: Peserta didik dapat menjelaskan proses fotosintesis secara lisan dan tulisan" />
+                  <button class="btn-tp-remove" title="Hapus">×</button>
+                </div>
+              </div>
+              <button class="btn-add-tp" id="btn-add-tp">+ Tambah Tujuan Pembelajaran</button>
+            </div>
+
+            <div class="form-group full">
+              <label>Profil Pelajar Pancasila</label>
+              <div class="checkbox-grid" id="p3-checkboxes">
+                <label class="check-card" id="p3-beriman">
+                  <input type="checkbox" name="p3" value="Beriman, Bertakwa kepada Tuhan YME, dan Berakhlak Mulia" />
+                  <span class="check-icon">🙏</span>
+                  <span class="check-label">Beriman & Berakhlak Mulia</span>
+                </label>
+                <label class="check-card" id="p3-berkebinekaan">
+                  <input type="checkbox" name="p3" value="Berkebinekaan Global" />
+                  <span class="check-icon">🌏</span>
+                  <span class="check-label">Berkebinekaan Global</span>
+                </label>
+                <label class="check-card" id="p3-gotong">
+                  <input type="checkbox" name="p3" value="Bergotong-royong" />
+                  <span class="check-icon">🤝</span>
+                  <span class="check-label">Bergotong-royong</span>
+                </label>
+                <label class="check-card" id="p3-mandiri">
+                  <input type="checkbox" name="p3" value="Mandiri" />
+                  <span class="check-icon">💪</span>
+                  <span class="check-label">Mandiri</span>
+                </label>
+                <label class="check-card" id="p3-bernalar">
+                  <input type="checkbox" name="p3" value="Bernalar Kritis" />
+                  <span class="check-icon">🧠</span>
+                  <span class="check-label">Bernalar Kritis</span>
+                </label>
+                <label class="check-card" id="p3-kreatif">
+                  <input type="checkbox" name="p3" value="Kreatif" />
+                  <span class="check-icon">✨</span>
+                  <span class="check-label">Kreatif</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="target-pd">Target Peserta Didik</label>
+              <select id="target-pd">
+                <option value="Peserta didik reguler/tipikal">Reguler / Tipikal</option>
+                <option value="Peserta didik dengan hambatan belajar">Dengan Hambatan Belajar</option>
+                <option value="Peserta didik cerdas istimewa berbakat (CIBI)">Cerdas Istimewa Berbakat (CIBI)</option>
+                <option value="Peserta didik dengan ketunaan">Dengan Ketunaan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tab-nav-footer">
+            <button class="btn-tab-prev" data-prev="0">← Sebelumnya</button>
+            <button class="btn-tab-next" data-next="2">Selanjutnya →</button>
+          </div>
+        </section>
+
+        <!-- TAB 2: KEGIATAN -->
+        <section class="tab-panel" data-panel="2" id="panel-2">
+          <div class="form-section-header">
+            <div class="section-icon">🎯</div>
+            <div>
+              <h2 class="section-title">Kegiatan Pembelajaran</h2>
+              <p class="section-desc">Model, moda, dan skenario pembelajaran</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="model-pembelajaran">Model Pembelajaran</label>
+              <select id="model-pembelajaran">
+                <option value="PBL">Problem Based Learning (PBL)</option>
+                <option value="PjBL">Project Based Learning (PjBL)</option>
+                <option value="Discovery">Discovery Learning</option>
+                <option value="Inquiry">Inquiry Learning</option>
+                <option value="Cooperative">Cooperative Learning</option>
+                <option value="Direct">Direct Instruction</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="moda">Moda Pembelajaran</label>
+              <select id="moda">
+                <option value="Tatap Muka">Tatap Muka</option>
+                <option value="PJJ Daring">PJJ Daring</option>
+                <option value="PJJ Luring">PJJ Luring</option>
+                <option value="Blended Learning">Blended Learning</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label for="sarana">Sarana & Prasarana / Media Pembelajaran</label>
+              <input type="text" id="sarana" placeholder="Contoh: LCD proyektor, laptop, LKPD, buku teks, alat peraga fotosintesis" />
+            </div>
+            <div class="form-group full">
+              <label for="sumber-belajar">Sumber Belajar</label>
+              <input type="text" id="sumber-belajar" placeholder="Contoh: Buku Siswa IPA Kelas 7 Kemendikbud 2022, video YouTube, artikel ilmiah" />
+            </div>
+
+            <div class="form-group full">
+              <label>Pertanyaan Pemantik</label>
+              <div class="pemantik-list" id="pemantik-list">
+                <div class="pemantik-item" data-index="0">
+                  <span class="pemantik-num">1.</span>
+                  <input type="text" class="pemantik-input" placeholder="Contoh: Mengapa daun berwarna hijau? Apa hubungannya dengan makanan?" />
+                  <button class="btn-pemantik-remove" title="Hapus">×</button>
+                </div>
+              </div>
+              <button class="btn-add-pemantik" id="btn-add-pemantik">+ Tambah Pertanyaan Pemantik</button>
+            </div>
+
+            <div class="form-group full">
+              <label>Diferensiasi Pembelajaran</label>
+              <div class="diff-options" id="diff-options">
+                <label class="radio-card">
+                  <input type="checkbox" name="diferensiasi" value="konten" id="diff-konten" />
+                  <span class="radio-label">
+                    <strong>Konten</strong>
+                    <small>Perbedaan bahan ajar sesuai kemampuan</small>
+                  </span>
+                </label>
+                <label class="radio-card">
+                  <input type="checkbox" name="diferensiasi" value="proses" id="diff-proses" />
+                  <span class="radio-label">
+                    <strong>Proses</strong>
+                    <small>Variasi strategi & pendekatan belajar</small>
+                  </span>
+                </label>
+                <label class="radio-card">
+                  <input type="checkbox" name="diferensiasi" value="produk" id="diff-produk" />
+                  <span class="radio-label">
+                    <strong>Produk</strong>
+                    <small>Pilihan bentuk luaran / karya siswa</small>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-nav-footer">
+            <button class="btn-tab-prev" data-prev="1">← Sebelumnya</button>
+            <button class="btn-tab-next" data-next="3">Selanjutnya →</button>
+          </div>
+        </section>
+
+        <!-- TAB 3: ASESMEN -->
+        <section class="tab-panel" data-panel="3" id="panel-3">
+          <div class="form-section-header">
+            <div class="section-icon">📊</div>
+            <div>
+              <h2 class="section-title">Asesmen & Evaluasi</h2>
+              <p class="section-desc">Penilaian dan pengukuran capaian peserta didik</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Jenis Asesmen</label>
+              <div class="toggle-group" id="jenis-asesmen">
+                <label class="toggle-card">
+                  <input type="checkbox" value="Asesmen Awal" id="asesmen-awal" checked />
+                  <span>🔍 Asesmen Awal (Diagnostik)</span>
+                </label>
+                <label class="toggle-card">
+                  <input type="checkbox" value="Asesmen Formatif" id="asesmen-formatif" checked />
+                  <span>📝 Asesmen Formatif</span>
+                </label>
+                <label class="toggle-card">
+                  <input type="checkbox" value="Asesmen Sumatif" id="asesmen-sumatif" />
+                  <span>📋 Asesmen Sumatif</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label>Teknik Asesmen</label>
+              <div class="checkbox-grid-2" id="teknik-asesmen">
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Observasi / Pengamatan" checked /><span>Observasi</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Penilaian Kinerja" /><span>Kinerja</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Tes Tertulis" /><span>Tes Tertulis</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Portofolio" /><span>Portofolio</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Produk" /><span>Produk</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Presentasi" /><span>Presentasi</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Jurnal Refleksi" /><span>Jurnal Refleksi</span></label>
+                <label class="check-card-sm"><input type="checkbox" name="teknik" value="Kuis / Pertanyaan Lisan" /><span>Kuis / Lisan</span></label>
+              </div>
+            </div>
+
+            <div class="form-group full">
+              <label for="instrumen">Instrumen Asesmen</label>
+              <input type="text" id="instrumen" placeholder="Contoh: Lembar observasi, LKPD, rubrik presentasi, soal pilihan ganda" />
+            </div>
+
+            <div class="form-group full">
+              <label for="remedial-pengayaan">Rencana Remedial & Pengayaan</label>
+              <textarea id="remedial-pengayaan" rows="3" placeholder="Contoh: Remedial: tutor sebaya dan latihan soal tambahan. Pengayaan: proyek mini investigasi mandiri sesuai minat siswa."></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label for="catatan-guru">Catatan / Refleksi Guru</label>
+              <textarea id="catatan-guru" rows="2" placeholder="(Opsional) Catatan khusus atau adaptasi kontekstual dari guru penyusun..."></textarea>
+            </div>
+          </div>
+
+          <!-- AI Enhancement Button -->
+          <div class="ai-enhance-section" id="ai-enhance-section">
+            <div class="ai-banner">
+              <div class="ai-banner-icon">🤖</div>
+              <div class="ai-banner-text">
+                <strong>Sempurnakan dengan AI</strong>
+                <p>Gemini AI akan memperkaya narasi kegiatan pembelajaran, pertanyaan pemantik, dan rubrik asesmen secara otomatis.</p>
+              </div>
+              <button class="btn-ai-enhance" id="btn-ai-enhance">
+                <span id="ai-btn-text">✨ Gunakan AI</span>
+                <span id="ai-spinner" class="spinner hidden"></span>
+              </button>
+            </div>
+            <p class="ai-note" id="ai-note">Masukkan Gemini API Key di bagian atas untuk menggunakan fitur ini.</p>
+          </div>
+
+          <div class="tab-nav-footer">
+            <button class="btn-tab-prev" data-prev="2">← Sebelumnya</button>
+            <button class="btn-primary btn-generate" id="btn-generate">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Generate Modul Ajar!
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- ===== RIGHT PANEL: PREVIEW ===== -->
+    <section class="panel-preview" id="panel-preview">
+      <div class="preview-toolbar" id="preview-toolbar">
+        <span class="preview-label">📄 Preview Modul Ajar</span>
+        <div class="preview-tools">
+          <button class="btn-preview-tool" id="btn-copy" title="Salin teks">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Salin
+          </button>
+        </div>
+      </div>
+      <div class="preview-body" id="preview-body">
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="10" y="8" width="60" height="64" rx="6" fill="url(#docGrad)" fill-opacity="0.15" stroke="url(#docGrad)" stroke-width="2"/>
+              <path d="M22 26h36M22 36h28M22 46h32M22 56h20" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.5"/>
+              <circle cx="60" cy="58" r="14" fill="#10b981"/>
+              <path d="M55 58l3.5 3.5L65 54" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="docGrad" x1="10" y1="8" x2="70" y2="72" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#10b981"/>
+                  <stop offset="1" stop-color="#6366f1"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h3 class="empty-title">Modul Ajar Anda Siap Dibuat!</h3>
+          <p class="empty-desc">Isi form di sebelah kiri, lalu klik tombol <strong>"Generate Modul Ajar!"</strong> untuk melihat hasil di sini. Preview akan tampil langsung dan siap dicetak.</p>
+          <div class="empty-steps">
+            <div class="step-chip">📋 Isi Identitas</div>
+            <div class="step-arrow">→</div>
+            <div class="step-chip">📚 Isi Materi</div>
+            <div class="step-arrow">→</div>
+            <div class="step-chip">🎯 Isi Kegiatan</div>
+            <div class="step-arrow">→</div>
+            <div class="step-chip">✅ Generate!</div>
+          </div>
+        </div>
+
+        <!-- Preview content (hidden initially) -->
+        <div class="rpp-document" id="rpp-document" style="display:none;" contenteditable="true" spellcheck="false"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
