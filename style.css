@@ -36,7 +36,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; scroll-behavior: smooth; }
-body { font-family: var(--font-body); background: var(--clr-bg-base); color: var(--clr-text-primary); min-height: 100vh; overflow: auto; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-body); background: var(--clr-bg-base); color: var(--clr-text-primary); min-height: 100vh; overflow-y: auto; -webkit-font-smoothing: antialiased; }
 
 /* === HEADER === */
 .app-header {
@@ -98,6 +98,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   min-height: calc(100vh - var(--header-h)); 
   margin-top: var(--header-h); 
   padding: 24px;
+  box-sizing: border-box;
 }
 
 /* === FORM PANEL === */
@@ -110,7 +111,7 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   display: flex; 
   flex-direction: column; 
-  overflow: hidden; 
+  overflow: visible; 
 }
 .progress-bar-wrap { height: 3px; background: var(--clr-bg-elevated); }
 .progress-bar { height: 100%; background: linear-gradient(90deg, var(--clr-accent-dark), var(--clr-accent)); transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 8px var(--clr-accent); width: 25%; }
