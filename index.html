@@ -33,13 +33,9 @@
       </div>
     </div>
     <div class="header-right">
-      <button class="btn-secondary" id="btn-reset" title="Bersihkan Form">
+      <button class="btn-secondary" id="btn-reset" title="Reset seluruh form">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         Reset Form
-      </button>
-      <button class="btn-secondary" id="btn-reset">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Reset
       </button>
       <button class="btn-primary btn-export" id="btn-export">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -69,6 +65,17 @@
           <span class="tab-num">4</span><span class="tab-label">Penutup & TTD</span>
         </button>
       </nav>
+
+      <!-- ===== TIME INDICATOR BAR ===== -->
+      <div class="time-bar" id="time-bar">
+        <span class="time-bar-label">⏱ Alokasi Waktu:</span>
+        <span class="time-bar-detail">
+          <span id="time-used-display">0'</span>
+          <span class="time-bar-sep">/ target</span>
+          <span id="time-target-display">50'</span>
+        </span>
+        <span class="time-badge" id="time-badge">—</span>
+      </div>
 
       <div class="form-body">
 

@@ -6,7 +6,7 @@
  */
 "use strict";
 
-const STORAGE_KEY = 'tools_rpp_wafa_apikey';
+const DRAFT_KEY = 'tools_rpp_wafa_draft';
 const LOGO_KEY = 'tools_rpp_wafa_logo';
 const KANTONG_KEY = 'tools_rpp_wafa_kantong';
 let currentTab = 0;
@@ -178,23 +178,6 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================================
-// GET SELECTED GEMINI MODEL
-// ============================================================
-function getSelectedModel() {
-  const sel = $('gemini-model');
-  if (!sel) return 'gemini-2.0-flash';
-  if (sel.value === 'custom') {
-    return $('gemini-model-custom')?.value.trim() || 'gemini-2.0-flash';
-  }
-  return sel.value;
-}
-// Model custom input toggle
-$('gemini-model')?.addEventListener('change', (e) => {
-  const c = $('gemini-model-custom');
-  if (c) c.style.display = e.target.value === 'custom' ? 'block' : 'none';
-});
-
-// ============================================================
 // LOGO UPLOAD & DISPLAY
 // ============================================================
 function showLogoPreview(dataUrl) {
@@ -238,6 +221,140 @@ $('btn-remove-logo')?.addEventListener('click', () => {
   schedulePreviewUpdate();
   showToast('\ud83d\uddd1\ufe0f Logo dihapus', 'info');
 });
+
+
+// ============================================================
+// AUTO-SAVE DRAFT
+// ============================================================
+const DRAFT_SAVE_DELAY = 800;
+let draftDebounce;
+
+function saveDraft() {
+  clearTimeout(draftDebounce);
+  draftDebounce = setTimeout(() => {
+    try {
+      const draft = {
+        namaSekolah: $('nama-sekolah')?.value || '',
+        judulRpp:    $('judul-rpp')?.value || '',
+        buku:        $('buku')?.value || '',
+        aspek:       $('aspek')?.value || '',
+        materi:      $('materi')?.value || '',
+        indikator:   $('indikator')?.value || '',
+        pertemuan:   $('pertemuan')?.value || '1',
+        kelas:       $('kelas')?.value || '4',
+        semester:    $('semester')?.value || '1',
+        waktuTotal:  $('waktu-total')?.value || '50',
+        p1Sarana:    $('p1-sarana')?.value || '',
+        p1Waktu:     $('p1-waktu')?.value || '5',
+        p2Sarana:    $('p2-sarana')?.value || '',
+        p2Waktu:     $('p2-waktu')?.value || '5',
+        p3Sub:       $('p3-sub')?.value || '',
+        p3Penjelasan:$('p3-penjelasan')?.value || '',
+        p3Pengulangan:$('p3-pengulangan')?.value || '',
+        p3Catatan:   $('p3-catatan')?.value || '',
+        p3Sarana:    $('p3-sarana')?.value || '',
+        p3Waktu:     $('p3-waktu')?.value || '20',
+        p4Sub:       $('p4-sub')?.value || '',
+        p4Sarana:    $('p4-sarana')?.value || '',
+        p4Waktu:     $('p4-waktu')?.value || '15',
+        p4Mode:      p4Mode,
+        p5Sarana:    $('p5-sarana')?.value || '',
+        p5Waktu:     $('p5-waktu')?.value || '5',
+        ttdKota:     $('ttd-kota')?.value || '',
+        ttdTanggal:  $('ttd-tanggal')?.value || '',
+        ksJabatan:   $('ks-jabatan')?.value || '',
+        ksNama:      $('ks-nama')?.value || '',
+        ksNip:       $('ks-nip')?.value || '',
+        guruNama:    $('guru-nama')?.value || '',
+        guruNip:     $('guru-nip')?.value || '',
+        // Activity lists saved as arrays
+        p1List:      getListValues('p1-list'),
+        p2List:      getListValues('p2-list'),
+        p3TiruList:  getListValues('p3-tiru-list'),
+        p4List:      getListValues('p4-list'),
+        p5List:      getListValues('p5-list'),
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch(e) { console.warn('Gagal menyimpan draft:', e); }
+  }, DRAFT_SAVE_DELAY);
+}
+
+function restoreList(listId, values, type) {
+  const list = $(listId);
+  if (!list || !values || values.length === 0) return;
+  list.innerHTML = '';
+  values.forEach((val) => {
+    const count = list.querySelectorAll('.activity-item').length;
+    const labelText = type === 'bullet' ? '•' : String.fromCharCode(97 + count) + '.';
+    const item = document.createElement('div');
+    item.className = 'activity-item';
+    item.innerHTML = `
+      <span class="act-label${type === 'bullet' ? ' bullet' : ''}">${labelText}</span>
+      <input type="text" class="act-input" value="${val.replace(/"/g, '&quot;')}" />
+      <button class="btn-act-rm">&times;</button>
+    `;
+    list.appendChild(item);
+  });
+  refreshListLabels(list);
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+
+    // Restore simple text/number/select fields
+    const fields = [
+      'nama-sekolah','judul-rpp','buku','aspek','materi','indikator',
+      'pertemuan','kelas','waktu-total',
+      'p1-sarana','p1-waktu','p2-sarana','p2-waktu',
+      'p3-sub','p3-penjelasan','p3-pengulangan','p3-catatan','p3-sarana','p3-waktu',
+      'p4-sub','p4-sarana','p4-waktu',
+      'p5-sarana','p5-waktu',
+      'ttd-kota','ttd-tanggal','ks-jabatan','ks-nama','ks-nip','guru-nama','guru-nip',
+    ];
+    const keyMap = {
+      'nama-sekolah':'namaSekolah','judul-rpp':'judulRpp','buku':'buku',
+      'aspek':'aspek','materi':'materi','indikator':'indikator',
+      'pertemuan':'pertemuan','kelas':'kelas','waktu-total':'waktuTotal',
+      'p1-sarana':'p1Sarana','p1-waktu':'p1Waktu',
+      'p2-sarana':'p2Sarana','p2-waktu':'p2Waktu',
+      'p3-sub':'p3Sub','p3-penjelasan':'p3Penjelasan','p3-pengulangan':'p3Pengulangan',
+      'p3-catatan':'p3Catatan','p3-sarana':'p3Sarana','p3-waktu':'p3Waktu',
+      'p4-sub':'p4Sub','p4-sarana':'p4Sarana','p4-waktu':'p4Waktu',
+      'p5-sarana':'p5Sarana','p5-waktu':'p5Waktu',
+      'ttd-kota':'ttdKota','ttd-tanggal':'ttdTanggal',
+      'ks-jabatan':'ksJabatan','ks-nama':'ksNama','ks-nip':'ksNip',
+      'guru-nama':'guruNama','guru-nip':'guruNip',
+    };
+    fields.forEach(id => {
+      const key = keyMap[id];
+      if (d[key] !== undefined && $(id)) $(id).value = d[key];
+    });
+    // Semester (select)
+    if (d.semester !== undefined && $('semester')) $('semester').value = d.semester;
+
+    // Restore activity lists
+    if (d.p1List?.length)      restoreList('p1-list',      d.p1List,      'alpha');
+    if (d.p2List?.length)      restoreList('p2-list',      d.p2List,      'alpha');
+    if (d.p3TiruList?.length)  restoreList('p3-tiru-list', d.p3TiruList,  'bullet');
+    if (d.p4List?.length)      restoreList('p4-list',      d.p4List,      'bullet');
+    if (d.p5List?.length)      restoreList('p5-list',      d.p5List,      'alpha');
+
+    // Restore P4 mode (skip confirm)
+    if (d.p4Mode && d.p4Mode !== p4Mode) switchP4Mode(d.p4Mode, true);
+    // Override sub after mode switch
+    if (d.p4Sub && $('p4-sub')) $('p4-sub').value = d.p4Sub;
+
+    updateTimeIndicator();
+    showToast('\ud83d\udcbe Draft tersimpan berhasil dimuat!', 'info', 3000);
+  } catch(e) { console.warn('Gagal memuat draft:', e); }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+}
 
 
 // ============================================================
@@ -557,7 +674,51 @@ document.querySelectorAll('#panel-0 input, #panel-0 select, #panel-0 textarea, #
 
 // Also on document input for dynamically added items
 document.addEventListener('input', (e) => {
-  if (e.target.classList.contains('act-input')) schedulePreviewUpdate();
+  if (e.target.classList.contains('act-input')) {
+    schedulePreviewUpdate();
+    saveDraft();
+  }
+});
+
+// Attach saveDraft to all form inputs
+document.querySelectorAll('#panel-0 input, #panel-0 select, #panel-0 textarea, #panel-1 input, #panel-1 select, #panel-1 textarea, #panel-2 input, #panel-2 select, #panel-2 textarea, #panel-3 input, #panel-3 select, #panel-3 textarea').forEach(el => {
+  el.addEventListener('input', saveDraft);
+  el.addEventListener('change', saveDraft);
+});
+
+// ============================================================
+// TIME INDICATOR
+// ============================================================
+function updateTimeIndicator() {
+  const target = parseInt($('waktu-total')?.value) || 50;
+  const used = ['p1-waktu','p2-waktu','p3-waktu','p4-waktu','p5-waktu']
+    .reduce((sum, id) => sum + (parseInt($(id)?.value) || 0), 0);
+
+  const usedEl    = $('time-used-display');
+  const targetEl  = $('time-target-display');
+  const badgeEl   = $('time-badge');
+
+  if (usedEl)   usedEl.textContent   = used + "'";
+  if (targetEl) targetEl.textContent = target + "'";
+
+  if (badgeEl) {
+    const diff = used - target;
+    if (diff === 0) {
+      badgeEl.textContent = '\u2713 Tepat';
+      badgeEl.className   = 'time-badge time-badge-ok';
+    } else if (diff > 0) {
+      badgeEl.textContent = `+${diff}' Lebih`;
+      badgeEl.className   = 'time-badge time-badge-over';
+    } else {
+      badgeEl.textContent = `${diff}' Kurang`;
+      badgeEl.className   = 'time-badge time-badge-under';
+    }
+  }
+}
+
+// Attach time indicator to waktu inputs and target
+['waktu-total','p1-waktu','p2-waktu','p3-waktu','p4-waktu','p5-waktu'].forEach(id => {
+  $(id)?.addEventListener('input', updateTimeIndicator);
 });
 
 // ============================================================
@@ -609,6 +770,8 @@ $('btn-reset').addEventListener('click', () => {
   document.querySelector('.panel-form').style.display = 'flex';
   $('panel-preview').style.display = 'none';
   
+  clearDraft();
+  updateTimeIndicator();
   switchTab(0);
   showToast('🔄 Form berhasil direset secara menyeluruh', 'info');
 });
@@ -639,11 +802,15 @@ $('btn-smart-reset')?.addEventListener('click', () => {
 
   ['p1-list', 'p2-list', 'p3-tiru-list', 'p4-list', 'p5-list'].forEach(id => refreshListLabels($(id)));
 
-  // Reset preview panel
+  // Reset preview panel and always return to form view
   $('rpp-document').style.display = 'none';
   $('rpp-document').innerHTML = '';
   $('empty-state').style.display = 'flex';
+  document.querySelector('.panel-form').style.display = 'flex';
+  $('panel-preview').style.display = 'none';
   
+  saveDraft();
+  updateTimeIndicator();
   switchTab(0);
   showToast('✨ Form dibersihkan! Identitas dipertahankan', 'success');
 });
@@ -855,7 +1022,7 @@ $('btn-clear-kantong')?.addEventListener('click', () => {
 // ============================================================
 // INIT
 // ============================================================
-loadApiKey();
+loadDraft();
 loadLogo();
 renderKantong();
 switchTab(0);
