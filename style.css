@@ -645,6 +645,45 @@ body { font-family: var(--font-body); background: var(--clr-bg-base); color: var
     break-after: auto !important;
   }
 
+  /* ===== CEGAH KONTEN TERPOTONG MELEWATI BATAS HALAMAN ===== */
+
+  /* Setiap baris tabel tidak boleh terpotong di tengah */
+  .wafa-main-table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Setiap sel tabel (td/th) juga tidak terpotong */
+  .wafa-main-table td,
+  .wafa-main-table th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Tabel identitas tidak terpotong */
+  .wafa-identity-section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Bagian footer/TTD tidak terpotong */
+  .wafa-footer {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Blok tanda tangan tidak terpotong */
+  .wafa-sig-row,
+  .wafa-sig-block {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Header tabel jangan diulang di setiap halaman (mencegah konflik layout) */
+  .wafa-main-table thead {
+    display: table-header-group;
+  }
+
   /* Fix signature for print — override flex to ensure side-by-side */
   .wafa-sig-row {
     display: table !important;
