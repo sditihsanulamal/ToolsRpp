@@ -666,12 +666,35 @@ $('btn-smart-reset-hdr')?.addEventListener('click', () => {
 // ============================================================
 // EXPORT / PRINT
 // ============================================================
+function doPrint() {
+  // Inject page-break-before ke elemen langsung setelah setiap manual break
+  const breaks = document.querySelectorAll('.rpp-manual-break');
+  const injected = [];
+  breaks.forEach(br => {
+    let next = br.nextElementSibling;
+    if (next) {
+      const prev = next.style.pageBreakBefore || '';
+      next.style.pageBreakBefore = 'always';
+      next.style.breakBefore = 'page';
+      injected.push({ el: next, prev });
+    }
+  });
+  window.print();
+  // Bersihkan setelah dialog print ditutup
+  setTimeout(() => {
+    injected.forEach(({ el, prev }) => {
+      el.style.pageBreakBefore = prev;
+      el.style.breakBefore = '';
+    });
+  }, 1000);
+}
+
 $('btn-export').addEventListener('click', () => {
   if (!$('rpp-document').innerHTML.trim()) {
     showToast('⚠️ Generate RPP terlebih dahulu!', 'error');
     return;
   }
-  window.print();
+  doPrint();
 });
 
 // ============================================================
@@ -681,6 +704,54 @@ $('btn-copy').addEventListener('click', () => {
   const doc = $('rpp-document');
   if (!doc.textContent.trim()) { showToast('⚠️ Generate RPP terlebih dahulu!', 'error'); return; }
   navigator.clipboard.writeText(doc.innerText).then(() => showToast('📋 Teks berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
+});
+
+// ============================================================
+// PAGE BREAK MANUAL
+// ============================================================
+function createPageBreakEl() {
+  const div = document.createElement('div');
+  div.className = 'rpp-manual-break';
+  div.contentEditable = 'false';
+  div.innerHTML = `
+    <span class="rpp-manual-break-label">
+      ✂️ Page Break — ganti halaman di sini
+      <button class="btn-remove-break" title="Hapus page break ini">×</button>
+    </span>
+  `;
+  div.querySelector('.btn-remove-break').addEventListener('click', () => {
+    div.remove();
+    showToast('🗑️ Page break dihapus', 'info', 1800);
+  });
+  return div;
+}
+
+$('btn-insert-pagebreak')?.addEventListener('click', () => {
+  const doc = $('rpp-document');
+  if (!doc.innerHTML.trim() || doc.style.display === 'none') {
+    showToast('⚠️ Generate RPP terlebih dahulu!', 'error');
+    return;
+  }
+  // Sisipkan di posisi kursor (selection) jika ada, atau di akhir dokumen
+  const sel = window.getSelection();
+  let inserted = false;
+  if (sel && sel.rangeCount > 0 && doc.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const range = sel.getRangeAt(0);
+    range.collapse(false);
+    const br = createPageBreakEl();
+    range.insertNode(br);
+    // Pindahkan kursor setelah break
+    const newRange = document.createRange();
+    newRange.setStartAfter(br);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+    inserted = true;
+  }
+  if (!inserted) {
+    doc.appendChild(createPageBreakEl());
+  }
+  showToast('✂️ Page break disisipkan! Konten setelah garis ini akan pindah ke halaman baru saat cetak.', 'success', 4000);
 });
 
 
@@ -858,7 +929,7 @@ function printAllPages() {
   const pages = getKantong();
   if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
   previewAllPages();
-  setTimeout(() => window.print(), 500);
+  setTimeout(() => doPrint(), 500);
 }
 
 /** Export semua halaman ke Word (.doc) */
