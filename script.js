@@ -7,6 +7,8 @@
 "use strict";
 
 const DRAFT_KEY = 'tools_rpp_wafa_draft';
+const DRAFT_PREVIEW_KEY = 'tools_rpp_wafa_preview';
+const DRAFT_VIEW_KEY = 'tools_rpp_wafa_view';
 const LOGO_KEY = 'tools_rpp_wafa_logo';
 const KANTONG_KEY = 'tools_rpp_wafa_kantong';
 let currentTab = 0;
@@ -347,6 +349,22 @@ function loadDraft() {
     // Override sub after mode switch
     if (d.p4Sub && $('p4-sub')) $('p4-sub').value = d.p4Sub;
 
+    // Restore preview state if user was in preview mode
+    const view = localStorage.getItem(DRAFT_VIEW_KEY);
+    if (view === 'preview') {
+      const previewHtml = localStorage.getItem(DRAFT_PREVIEW_KEY);
+      if (previewHtml) {
+        const doc = $('rpp-document');
+        const empty = $('empty-state');
+        doc.innerHTML = previewHtml;
+        doc.style.display = 'block';
+        empty.style.display = 'none';
+        document.querySelector('.panel-form').style.display = 'none';
+        $('panel-preview').style.display = 'flex';
+        $('preview-body').scrollTop = 0;
+      }
+    }
+
     updateTimeIndicator();
     showToast('\ud83d\udcbe Draft tersimpan berhasil dimuat!', 'info', 3000);
   } catch(e) { console.warn('Gagal memuat draft:', e); }
@@ -354,6 +372,8 @@ function loadDraft() {
 
 function clearDraft() {
   localStorage.removeItem(DRAFT_KEY);
+  localStorage.removeItem(DRAFT_PREVIEW_KEY);
+  localStorage.removeItem(DRAFT_VIEW_KEY);
 }
 
 
@@ -630,6 +650,12 @@ function buildRPPHtml(d) {
 // ============================================================
 // GENERATE & PREVIEW
 // ============================================================
+function updateRPPContent() {
+  const html = buildRPPHtml(collectData());
+  const doc = $('rpp-document');
+  doc.innerHTML = html;
+}
+
 function generateAndShow(overrides = null) {
   const d = collectData();
   if (overrides) Object.assign(d, overrides);
@@ -645,11 +671,15 @@ function generateAndShow(overrides = null) {
   $('panel-preview').style.display = 'flex';
   
   $('preview-body').scrollTop = 0;
+
+  localStorage.setItem(DRAFT_VIEW_KEY, 'preview');
+  localStorage.setItem(DRAFT_PREVIEW_KEY, doc.innerHTML);
 }
 
 $('btn-back-edit')?.addEventListener('click', () => {
   document.querySelector('.panel-form').style.display = 'flex';
   $('panel-preview').style.display = 'none';
+  localStorage.setItem(DRAFT_VIEW_KEY, 'form');
 });
 
 $('btn-generate').addEventListener('click', () => {
@@ -662,8 +692,15 @@ let previewDebounce;
 function schedulePreviewUpdate() {
   if ($('rpp-document').style.display !== 'block') return;
   clearTimeout(previewDebounce);
-  previewDebounce = setTimeout(() => generateAndShow(), 700);
+  previewDebounce = setTimeout(() => updateRPPContent(), 700);
 }
+
+// Save manual HTML edits directly to preview draft
+$('rpp-document')?.addEventListener('input', () => {
+  if (localStorage.getItem(DRAFT_VIEW_KEY) === 'preview') {
+    localStorage.setItem(DRAFT_PREVIEW_KEY, $('rpp-document').innerHTML);
+  }
+});
 
 // Attach live update to all form inputs
 document.querySelectorAll('#panel-0 input, #panel-0 select, #panel-0 textarea, #panel-1 input, #panel-1 select, #panel-1 textarea, #panel-2 input, #panel-2 select, #panel-2 textarea, #panel-3 input, #panel-3 select, #panel-3 textarea').forEach(el => {
@@ -863,7 +900,8 @@ function addToKantong() {
   pages.push({
     id: Date.now(),
     label,
-    formData: d, // simpan data form, bukan HTML — lebih hemat storage
+    formData: d, 
+    htmlData: doc.innerHTML, // Simpan HTML yang sudah diedit user
     savedAt: new Date().toLocaleString('id-ID', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
   });
   saveKantong(pages);
@@ -884,7 +922,7 @@ window.deleteFromKantong = deleteFromKantong;
 function previewSinglePage(id) {
   const page = getKantong().find(p => p.id === Number(id));
   if (!page) return;
-  const html = buildRPPHtml(page.formData);
+  const html = page.htmlData || buildRPPHtml(page.formData);
   const doc = $('rpp-document');
   doc.innerHTML = html;
   doc.className = 'rpp-document';
@@ -900,7 +938,7 @@ function previewAllPages() {
   const pages = getKantong();
   if (!pages.length) { showToast('Kantong masih kosong!', 'error'); return; }
   const allHtml = pages.map((p, i) => `
-    <div class="rpp-page-wrapper">${buildRPPHtml(p.formData)}</div>
+    <div class="rpp-page-wrapper">${p.htmlData || buildRPPHtml(p.formData)}</div>
     ${i < pages.length - 1 ? `<div class="rpp-page-break"><span>\u2015 Halaman ${i + 2} \u2015</span></div>` : ''}
   `).join('');
   const doc = $('rpp-document');
@@ -952,7 +990,7 @@ function exportToWord() {
   </style>`;
 
   const allPages = pages.map((p, i) => `
-    <div>${buildRPPHtml(p.formData)}</div>
+    <div>${p.htmlData || buildRPPHtml(p.formData)}</div>
     ${i < pages.length - 1 ? '<div style="page-break-after:always"></div>' : ''}
   `).join('');
 
